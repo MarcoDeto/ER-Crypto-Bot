@@ -98,28 +98,8 @@ def main():
         # condizioni per gli avvisi incrocio ema short
         Short(coin, ema_short, ema_long, last_ema_short, last_ema_long)
             	
-        time.sleep(0.5);
+        time.sleep(0.5)
             
 # chiaman la funzione
 if __name__ == "__main__":
     main()
-            
-            
-            
-            
-            
-            
-            
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
