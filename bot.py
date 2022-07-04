@@ -20,6 +20,10 @@ SYMBOLS = [
     "VETUSDT"
 ]
 
+listacoin = {}
+for i in SYMBOLS:
+    listacoin[i] = 'False'
+
 #SYMBOLS = []
 # otteniamo i dati di klines da elaborare
 def get_klines(symbol):
@@ -30,21 +34,58 @@ def get_klines(symbol):
     for each in data:
         return_data.append(float(each[4])) # 4 è l'indice dei dati di chiusura in ogni kline 
     return np.array(return_data) # ritornando come array numpy per una migliore precisione e prestazioni
+ 
+def Long(coin, ema_short, ema_long, last_ema_short, last_ema_long):
+    
+    if(ema_short > ema_long and last_ema_short < last_ema_long):
+        message = coin + " "+ str(SHORT_EMA) + " Sopra "+str(LONG_EMA)
+        
+        if listacoin.get(coin) == 'True' :
+            return
+        
+        print(message)
+        print(coin, "è arrivata l'allerta in long acquisto") 
+        Cprz = client.get_symbol_ticker(symbol=coin)
+        prezzocoin = Cprz["price"]
 
+        salvacoin = open("/home/fabry/progetti/bot/" + coin + ".txt", "a")
+        salvacoin.writelines(" Entrata " + coin + " " + prezzocoin + "\n")
+        salvacoin.close()
+        listacoin.get[coin] = 'True'
+        
+def Short(coin, ema_short, ema_long, last_ema_short, last_ema_long):
+    
+    if(ema_short < ema_long and last_ema_short > last_ema_long):
+        message = coin + " "+ str(LONG_EMA) + " Sopra "+str(SHORT_EMA)
+        
+        if listacoin.get(coin) == 'True' :
+            return
+        
+        print(message)
+        print(coin, "è arrivata l'allerta in short vendita") 
+        Cprz = client.get_symbol_ticker(symbol=coin)
+        prezzocoin = Cprz["price"]
+
+        salvacoin = open("/home/fabry/progetti/bot/" + coin + ".txt", "a")
+        salvacoin.writelines(" Uscita " + coin + " " + prezzocoin + "\n")
+        salvacoin.writelines("-------------------------------------------------" + "\n")
+        salvacoin.close()
+        listacoin.get[coin] = 'False'
+        
 # punto di ingresso per il file
 def main(): 
     
     buy = False #significa che dobbiamo ancora comprare e non abbiamo comprato
     sell = True #non abbiamo venduto, ma se vuoi acquistare prima, impostalo su True
     acquisto = False
-    listacoin = {}
-    for i in SYMBOLS:
-    	listacoin[i] = 'False'
+
     # creando un ciclo infinito che continua a verificare la condizione
     while True:
+        
         #passando in rassegna ogni moneta 
-        for each in SYMBOLS:
-            data = get_klines(each)
+        for coin in SYMBOLS:
+            Long
+            data = get_klines(coin)
             ema_short = talib.EMA(data,int(SHORT_EMA))
             ema_long = talib.EMA(data,int(LONG_EMA))
             
@@ -55,49 +96,10 @@ def main():
             ema_long = ema_long[-1]
             
         # condizioni per gli avvisi incrocio ema long
-	    if(ema_short > ema_long and last_ema_short < last_ema_long):
-		    message  = each + " "+ str(SHORT_EMA) + " Sopra "+str(LONG_EMA);
-            	#print(message);  
-            	#print(each ,"è arrivata l'allerta in long acquisto");
-			if listacoin.get(each) == 'False' :
-            			print(message);  
-            			print(each ,"è arrivata l'allerta in long acquisto");
-            			#Rilevo il prezzo della coin
-				Cprz = client.get_symbol_ticker(symbol=each)
-
-				prezzocoin = Cprz["price"]
-
-            			salvacoin = open("/home/fabry/progetti/bot/" + each + ".txt", "a")
-            			salvacoin.writelines(" Entrata " + each + " " + prezzocoin + "\n")
-            			salvacoin.close()
-            			listacoin.get[each] = 'True'
-            			print(listacoin.get(each))
-            		
-            			if listacoin.get(each) == 'True' :
-            				return
-            	#send_message(message);
+        Long(coin, ema_short, ema_long, last_ema_short, last_ema_long)      
             	
-            # condizioni per gli avvisi incrocio ema short
-           if (ema_long > ema_short and last_ema_long < last_ema_short):
-            	message  = each + " "+ str(LONG_EMA) + " Sopra "+str(SHORT_EMA);
-            	if listacoin.get(each) == 'True' :
-            		
-            		print(message);  
-            		print(each ," arrivata l'allerta in short vendita");
-            		#Rilevo il prezzo della coin
-			Cprz = client.get_symbol_ticker(symbol=each)
-
-			prezzocoin = Cprz["price"]
-
-            		salvacoin = open("/home/fabry/progetti/bot/" + each + ".txt", "a")
-            		salvacoin.writelines(" Uscita" + each + " " + prezzocoin + "\n")
-            		salvacoin.writelines("-------------------------------------------------" + "\n")
-            		salvacoin.close()
-            		listacoin.get[each] = 'False'
-            		print(listacoin.get(each))
-            		
-            		if listacoin.get(each) == 'False' :
-            			return
+        # condizioni per gli avvisi incrocio ema short
+        Short(coin, ema_short, ema_long, last_ema_short, last_ema_long)
             	
         time.sleep(0.5);
             
