@@ -1,10 +1,10 @@
 ##inizieremo con definendo alcune costanti
-import  requests 
+import requests 
 import numpy as np 
 import time
 import os
 import talib #libreria talib per vari calcoli relativi a indicatori finanziari e tecnici
-from binance.client  import Client  #importing client 
+from binance.client import Client  #importing client 
 from config import api_key , api_secret, INTERVAL, SHORT_EMA , LONG_EMA 
 
 client = Client(api_key, api_secret)
@@ -38,16 +38,14 @@ def get_klines(symbol):
 def Long(coin, ema_short, ema_long, last_ema_short, last_ema_long):
     
     if(ema_short > ema_long and last_ema_short < last_ema_long):
-        message = coin + " "+ str(SHORT_EMA) + " Sopra "+str(LONG_EMA)
         
         if listacoin.get(coin) == 'True' :
             return
         
-        print(message)
+        print(coin + " "+ str(SHORT_EMA) + " Sopra "+str(LONG_EMA))
         print(coin, "è arrivata l'allerta in long acquisto") 
         Cprz = client.get_symbol_ticker(symbol=coin)
         prezzocoin = Cprz["price"]
-
         salvacoin = open("/home/fabry/progetti/bot/" + coin + ".txt", "a")
         salvacoin.writelines(" Entrata " + coin + " " + prezzocoin + "\n")
         salvacoin.close()
@@ -56,12 +54,11 @@ def Long(coin, ema_short, ema_long, last_ema_short, last_ema_long):
 def Short(coin, ema_short, ema_long, last_ema_short, last_ema_long):
     
     if(ema_short < ema_long and last_ema_short > last_ema_long):
-        message = coin + " "+ str(LONG_EMA) + " Sopra "+str(SHORT_EMA)
-        
+
         if listacoin.get(coin) == 'True' :
             return
         
-        print(message)
+        print(coin + " "+ str(LONG_EMA) + " Sopra "+str(SHORT_EMA))
         print(coin, "è arrivata l'allerta in short vendita") 
         Cprz = client.get_symbol_ticker(symbol=coin)
         prezzocoin = Cprz["price"]
