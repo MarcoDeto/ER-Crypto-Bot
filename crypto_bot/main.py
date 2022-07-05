@@ -12,7 +12,6 @@ from services.mongoDB import *
 
 client = Client(api_key, api_secret)
 
-
 # otteniamo i dati di klines da elaborare
 def get_klines(symbol: Symbol):
     data = client.get_klines(symbol=symbol,interval=INTERVAL,limit=300)

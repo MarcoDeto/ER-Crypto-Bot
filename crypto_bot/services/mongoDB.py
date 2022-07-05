@@ -2,7 +2,7 @@
 from bson import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
-from config import *
+from config import INTERVAL, SHORT_EMA , LONG_EMA 
 
 def insertEMA(price, operation, cross, ema_short, ema_long, last_ema_short, last_ema_long):
 
