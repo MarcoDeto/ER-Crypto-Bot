@@ -1,8 +1,8 @@
 from enum import Enum
-class Operation(Enum):
+class OperationType(Enum):
    OPEN = 1
    CLOSE = 2
 
-class Cross(Enum):
+class CrossType(Enum):
    LONG = 1
    SHORT = 2
