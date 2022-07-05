@@ -1,9 +1,9 @@
 import requests 
-import numpy as np 
+import numpy as np #pip3 install numpy
 import time
 import os
-import talib #libreria ta-lib per vari calcoli relativi a indicatori finanziari e tecnici
-from binance.client import Client  #importing client 
+import talib #pip3 install ta-lib
+from binance.client import Client  #pip3 install python-binance
 from config import api_key , api_secret, INTERVAL, SHORT_EMA , LONG_EMA 
 from models.Symbol import Symbol
 from models.Enums import *

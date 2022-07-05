@@ -1,6 +1,6 @@
 
 from bson import ObjectId
-from pymongo import MongoClient
+from pymongo import MongoClient #pip3 install pymongo
 from datetime import datetime
 from config import INTERVAL, SHORT_EMA , LONG_EMA 
 
