@@ -23,6 +23,7 @@ def insertEMA(price, operation, cross, ema_short, ema_long, last_ema_short, last
         'price': price,
         'operation': operationType.name,
         'cross': cross.name,
+        'time_frame': INTERVAL,
         'ema_main': SHORT_EMA,
         'ema_second': LONG_EMA,
         'ema_short': ema_short,
