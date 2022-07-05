@@ -24,7 +24,7 @@ def find(val, list):
          continue
       return x
 
-def checkCoin(symbols, coin, cross: CrossType):
+def checkCoin(coin, cross: CrossType):
 
    result = getEMA(coin['symbol'])
    if (result):

@@ -23,11 +23,11 @@ def get_klines(symbol: Symbol):
     return np.array(return_data) # ritornando come array numpy per una migliore precisione e prestazioni
 
 
-def Long(symbols, coin, ema_short, ema_long, last_ema_short, last_ema_long):
+def Long(coin, ema_short, ema_long, last_ema_short, last_ema_long):
     
     if (ema_short > ema_long and last_ema_short < last_ema_long):
         
-        operation = checkCoin(symbols, coin, CrossType.LONG)
+        operation = checkCoin(coin, CrossType.LONG)
         if (operation == False): return
 
         Cprz = client.get_symbol_ticker(symbol=coin['symbol'])
@@ -35,11 +35,11 @@ def Long(symbols, coin, ema_short, ema_long, last_ema_short, last_ema_long):
         insertEMA(price_coin, operation, CrossType.LONG, ema_short, ema_long, last_ema_short, last_ema_long)
         
 
-def Short(symbols, coin, ema_short, ema_long, last_ema_short, last_ema_long):
+def Short(coin, ema_short, ema_long, last_ema_short, last_ema_long):
     
     if (ema_short < ema_long and last_ema_short > last_ema_long):
 
-        operation = checkCoin(symbols, coin, CrossType.SHORT)
+        operation = checkCoin(coin, CrossType.SHORT)
         if (operation == False): return
 
         Cprz = client.get_symbol_ticker(symbol=coin['symbol'])
@@ -75,9 +75,9 @@ def main():
             ema_short = ema_short[-1]
             ema_long = ema_long[-1]
             # condizioni per gli avvisi incrocio ema long
-            Long(Symbols, coin, ema_short, ema_long, last_ema_short, last_ema_long)      	
+            Long(coin, ema_short, ema_long, last_ema_short, last_ema_long)      	
             # condizioni per gli avvisi incrocio ema short
-            Short(Symbols, coin, ema_short, ema_long, last_ema_short, last_ema_long)
+            Short(coin, ema_short, ema_long, last_ema_short, last_ema_long)
             	
         time.sleep(0.5)
             
