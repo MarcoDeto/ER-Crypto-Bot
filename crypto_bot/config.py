@@ -1,4 +1,5 @@
 ### configuration details 
+CONNECTION_STRING = 'mongodb+srv://dev:ManTyres@mantyres.fwdxdp6.mongodb.net'
 TELEGRAM_TOKEN = '' # telegram bot token 
 TELEGRAM_CHANNEL = ''  #'-1001712239713' # channel id 
 INTERVAL = '5m' # binance time interval 

@@ -1,59 +1,32 @@
 
-from bson import ObjectId #pip3 install pymongo
-from pymongo import MongoClient #pip3 install "pymongo[srv]"
+from bson import ObjectId # pip3 install pymongo
+from pymongo import MongoClient # pip3 install "pymongo[srv]"
 from datetime import datetime
-from config import INTERVAL, LONG_EMA, SHORT_EMA
+from config import CONNECTION_STRING, INTERVAL, LONG_EMA, SHORT_EMA
+from models.Enums import OperationType
 
-def insertEMA(price, operation, cross, ema_short, ema_long, last_ema_short, last_ema_long):
-
-   CONNECTION_STRING = 'mongodb+srv://dev:ManTyres@mantyres.fwdxdp6.mongodb.net'
+def getConnection():
    client = MongoClient(CONNECTION_STRING)
    mongoDB = client['ManTyres']
    collection = mongoDB['EMAs']
-   operationType = operation.operation
-   coin = operation.coin
-   EMA = {
-        '_id' : ObjectId(),
-        'symbol': coin.symbol,
-        'base': coin.base,
-        'quote': coin.quote,
-        'isMarginTrade': coin.isBuyAllowed,
-        'isBuyAllowed': coin.isBuyAllowed,
-        'isSellAllowed': coin.isSellAllowed,
-        'price': price,
-        'operation': operationType.name,
-        'cross': cross.name,
-        'time_frame': INTERVAL,
-        'ema_main': SHORT_EMA,
-        'ema_second': LONG_EMA,
-        'ema_short': ema_short,
-        'ema_long': ema_long,
-        'last_ema_short': last_ema_short,
-        'last_ema_long': last_ema_long,
-        'CreateAT': datetime.now()
-   }
-   return collection.insert_one(EMA)
+   return collection
 
 def getEMAs():
 
-   CONNECTION_STRING = 'mongodb+srv://dev:ManTyres@mantyres.fwdxdp6.mongodb.net'
-   client = MongoClient(CONNECTION_STRING)
-   mongoDB = client['ManTyres']
-   collection = mongoDB['EMAs']
+   collection = getConnection()
    item_details = collection.find()
-   result = {}
-   i = 0
+   result = []
    for item in item_details:
-      result[i] = item
-      i = i+1
+      result.append(item)
    return result
+
+def getDistinctEMAs():
+
+   print()
 
 def getEMA(symbol):
 
-   CONNECTION_STRING = 'mongodb+srv://dev:ManTyres@mantyres.fwdxdp6.mongodb.net'
-   client = MongoClient(CONNECTION_STRING)
-   mongoDB = client['ManTyres']
-   collection = mongoDB['EMAs']
+   collection = getConnection()
    query = {'symbol': symbol}
    item_details = collection.find(query).sort('symbol')
    result = {}
@@ -64,3 +37,28 @@ def getEMA(symbol):
    if (len(result) > 0):
       return result[0]
    return result
+
+def insertEMA(price, operation, cross):
+
+   collection = getConnection()
+   operationType = operation.operation
+   lastDBRow = operation.coin
+   EMA = {
+        '_id' : ObjectId(),
+        'symbol': lastDBRow.symbol,
+        'base': lastDBRow.base,
+        'quote': lastDBRow.quote,
+        'isMarginTrade': lastDBRow.isBuyAllowed,
+        'isBuyAllowed': lastDBRow.isBuyAllowed,
+        'isSellAllowed': lastDBRow.isSellAllowed,
+        'price': price,
+        'operation_number': lastDBRow.operation_number,
+        'operation': operationType.name,
+        'cross': cross.name,
+        'time_frame': INTERVAL,
+        'ema_main': SHORT_EMA,
+        'ema_second': LONG_EMA,
+        'CreateAT': datetime.now()
+   }
+   return collection.insert_one(EMA)
+

@@ -1,61 +1,15 @@
-import requests 
-import numpy as np #pip3 install numpy
 import time
-import os
 import talib #pip3 install ta-lib
-from binance.client import Client  #pip3 install python-binance
-from config import api_key , api_secret, INTERVAL, SHORT_EMA , LONG_EMA 
+from config import SHORT_EMA , LONG_EMA 
 from models.Symbol import Symbol
-from models.Enums import *
-from services.coins import *
-from services.mongoDB import *
-
-client = Client(api_key, api_secret)
-
-# otteniamo i dati di klines da elaborare
-def get_klines(symbol: Symbol):
-    data = client.get_klines(symbol=symbol,interval=INTERVAL,limit=300)
-    # più dati significa più precisione ma a un compromesso tra velocità e tempo
-    return_data = []
-    # prendendo i dati di chiusura per ogni kline
-    for each in data:
-        return_data.append(float(each[4])) # 4 è l'indice dei dati di chiusura in ogni kline 
-    return np.array(return_data) # ritornando come array numpy per una migliore precisione e prestazioni
+from services.binance import get_klines, getSymbols
+from services.coins import isToSkip
+from services.emas import Long, Short
 
 
-def Long(coin, ema_short, ema_long, last_ema_short, last_ema_long):
-    
-    if (ema_short > ema_long and last_ema_short < last_ema_long):
-        
-        operation = checkCoin(coin, CrossType.LONG)
-        if (operation == False): return
-
-        Cprz = client.get_symbol_ticker(symbol=coin['symbol'])
-        price_coin = Cprz['price']
-        insertEMA(price_coin, operation, CrossType.LONG, ema_short, ema_long, last_ema_short, last_ema_long)
-        
-
-def Short(coin, ema_short, ema_long, last_ema_short, last_ema_long):
-    
-    if (ema_short < ema_long and last_ema_short > last_ema_long):
-
-        operation = checkCoin(coin, CrossType.SHORT)
-        if (operation == False): return
-
-        Cprz = client.get_symbol_ticker(symbol=coin['symbol'])
-        price_coin = Cprz['price']
-        insertEMA(price_coin, operation, CrossType.SHORT, ema_short, ema_long, last_ema_short, last_ema_long)
-        
-
-# punto di ingresso per il file
 def main(): 
     
-    coin_list = client.get_all_isolated_margin_symbols()
-    filtered = filter(lambda coin: coin['quote'] == 'USDT' or coin['quote'] == 'BTC', coin_list)
-    Symbols = []
-    i = 0
-    for item in filtered:
-        Symbols.append(item)
+    Symbols = getSymbols()
 
     # ciclo infinito
     while True:
@@ -81,5 +35,6 @@ def main():
             	
         time.sleep(0.5)
             
+
 if __name__ == '__main__':
     main()
