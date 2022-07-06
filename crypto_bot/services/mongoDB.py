@@ -1,8 +1,8 @@
 
-from bson import ObjectId
-from pymongo import MongoClient #pip3 install pymongo
+from bson import ObjectId #pip3 install pymongo
+from pymongo import MongoClient #pip3 install "pymongo[srv]"
 from datetime import datetime
-from config import INTERVAL, SHORT_EMA , LONG_EMA 
+from config import INTERVAL, LONG_EMA, SHORT_EMA
 
 def insertEMA(price, operation, cross, ema_short, ema_long, last_ema_short, last_ema_long):
 
