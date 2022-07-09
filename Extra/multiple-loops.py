@@ -42,22 +42,3 @@ def newtest():
     SOCK = "wss://stream.binance.com:9443/stream?streams=ethusdt@kline_1m/btcusdt@kline_1m/bnbusdt@kline_1m/ethbtc@kline_1m"
     ws = websocket.WebSocketApp(SOCK, on_open=on_open,on_close=on_close, on_message=on_message)
     ws.run_forever()
-
-
-
-def main():
-    #redis = await aioredis.create_redis_pool('redis://localhost')
-
-    #ch, = await redis.psubscribe('channel:*')
-    #assert isinstance(ch, aioredis.Channel)
-
-    async def reader(channel):
-        async for ch, message in channel.iter():
-            print("Got message in channel:", ch, ":", message)
-    asyncio.get_running_loop().create_task(reader(ch))
-
-    await redis.publish('channel:1', 'Hello')
-    await redis.publish('channel:2', 'World')
-
-    redis.close()
-    await redis.wait_closed() 
