@@ -1,41 +1,17 @@
-import asyncio
 from datetime import datetime
+from services.mongoDB import dropCollection
 from config import INTERVALS
-from services.binance import get_klines, getSymbols
+from services.binance import getSymbols, get_historical_klines
 from services.coins import isToSkip
 from services.emas import checkEMAs
 
 def main():
-    loop = asyncio.get_event_loop()
+    #dropCollection()
     for interval in INTERVALS:
-        loop.create_task(intervaLoop(interval))
-
-    loop.run_forever()
-
-    
-async def getDelay(interval):
-    match interval:
-        case '1m':
-            return .1
-        case '3m':
-            return .3
-        case '5m':
-            return .5
-        case '15m':
-            return 1.5
-        case '30m':
-            return 3
-        case '1h':
-            return 6
-        case '4h':
-            return 24
-        case '1d':
-            return 144
-        case _:
-            return 1
+        intervaLoop(interval)
 
 
-async def intervaLoop(interval):
+def intervaLoop(interval):
     
     print('\nSTART')
     print(interval)
@@ -46,13 +22,19 @@ async def intervaLoop(interval):
     if (isToSkip(symbol)):
         return
         
-    delay = await getDelay(interval)
+    data = get_historical_klines(symbol, interval)
+    klines = len(data)
+    if (klines < 300):
+        print('There are less than 300 candles! Not accurate calculation!')
+        return
+    candles = data[0:300]
+    
     while True:
-        await asyncio.sleep(delay)
-        print(datetime.now())
-        print(interval + '\n')
-        data = await get_klines(symbol, interval)
-        await checkEMAs(data, coin, interval)
+        checkEMAs(candles, coin, interval)
+        if (len(candles) != klines):
+            candles.append(data[len(candles)])
+        else: 
+            return
 
 
 def check_coount(interval, index):
@@ -67,3 +49,5 @@ if __name__ == '__main__':
         main()
     except Exception as f:
         print('main error: ', f)
+
+
