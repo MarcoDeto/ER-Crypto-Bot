@@ -1,40 +1,69 @@
-import time
-import talib #pip3 install ta-lib
-from config import SHORT_EMA , LONG_EMA 
-from models.Symbol import Symbol
+import asyncio
+from datetime import datetime
+from config import INTERVALS
 from services.binance import get_klines, getSymbols
 from services.coins import isToSkip
-from services.emas import Long, Short
+from services.emas import checkEMAs
 
+def main():
+    loop = asyncio.get_event_loop()
+    for interval in INTERVALS:
+        loop.create_task(intervaLoop(interval))
 
-def main(): 
+    loop.run_forever()
+
     
+async def getDelay(interval):
+    match interval:
+        case '1m':
+            return .1
+        case '3m':
+            return .3
+        case '5m':
+            return .5
+        case '15m':
+            return 1.5
+        case '30m':
+            return 3
+        case '1h':
+            return 6
+        case '4h':
+            return 24
+        case '1d':
+            return 144
+        case _:
+            return 1
+
+
+async def intervaLoop(interval):
+    
+    print('\nSTART')
+    print(interval)
+    print(datetime.now())
     Symbols = getSymbols()
-
-    # ciclo infinito
-    while True:
+    coin = Symbols[0]
+    symbol = coin['symbol']
+    if (isToSkip(symbol)):
+        return
         
-        for coin in Symbols:
+    delay = await getDelay(interval)
+    while True:
+        await asyncio.sleep(delay)
+        print(datetime.now())
+        print(interval + '\n')
+        data = await get_klines(symbol, interval)
+        await checkEMAs(data, coin, interval)
 
-            symbol = coin['symbol']
-            # skipper
-            if (isToSkip(symbol)): 
-                continue
-            
-            data = get_klines(symbol)
-            ema_short = talib.EMA(data,int(SHORT_EMA))
-            ema_long = talib.EMA(data,int(LONG_EMA))
-            last_ema_short  = ema_short[-2]
-            last_ema_long = ema_long[-2]
-            ema_short = ema_short[-1]
-            ema_long = ema_long[-1]
-            # condizioni per gli avvisi incrocio ema long
-            Long(coin, ema_short, ema_long, last_ema_short, last_ema_long)      	
-            # condizioni per gli avvisi incrocio ema short
-            Short(coin, ema_short, ema_long, last_ema_short, last_ema_long)
-            	
-        time.sleep(0.5)
-            
+
+def check_coount(interval, index):
+    if (index > 1200):
+        print('\nEND\n')
+        print(interval)
+        print(datetime.now())
+
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as f:
+        print('main error: ', f)

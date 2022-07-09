@@ -1,15 +1,20 @@
 
-from bson import ObjectId # pip3 install pymongo
-from pymongo import MongoClient # pip3 install "pymongo[srv]"
+from bson import ObjectId  # pip3 install pymongo
+from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
-from config import CONNECTION_STRING, INTERVAL, LONG_EMA, SHORT_EMA
-from models.Enums import OperationType
+
+import pymongo
+from config import CONNECTION_STRING, MAIN_EMA
+from models.operation import Operation
+from services.binance import diffPercent, diffTime, getPrice
+
 
 def getConnection():
    client = MongoClient(CONNECTION_STRING)
    mongoDB = client['ManTyres']
    collection = mongoDB['EMAs']
    return collection
+
 
 def getEMAs():
 
@@ -20,15 +25,12 @@ def getEMAs():
       result.append(item)
    return result
 
-def getDistinctEMAs():
 
-   print()
-
-def getEMA(symbol):
+def getEMA(coin, second_ema, interval):
 
    collection = getConnection()
-   query = {'symbol': symbol}
-   item_details = collection.find(query).sort('symbol')
+   query = {'symbol': coin['symbol'], "ema_second": second_ema, 'time_frame': interval}
+   item_details = collection.find(query).sort('open_date', pymongo.DESCENDING)
    result = {}
    i = 0
    for item in item_details:
@@ -38,27 +40,69 @@ def getEMA(symbol):
       return result[0]
    return result
 
-def insertEMA(price, operation, cross):
 
+def insertEMA(operation: Operation):
+   print('INSERT\n')
    collection = getConnection()
-   operationType = operation.operation
-   lastDBRow = operation.coin
+   symbol = operation.symbol
+   price = getPrice(symbol)
    EMA = {
-        '_id' : ObjectId(),
-        'symbol': lastDBRow.symbol,
-        'base': lastDBRow.base,
-        'quote': lastDBRow.quote,
-        'isMarginTrade': lastDBRow.isBuyAllowed,
-        'isBuyAllowed': lastDBRow.isBuyAllowed,
-        'isSellAllowed': lastDBRow.isSellAllowed,
-        'price': price,
-        'operation_number': lastDBRow.operation_number,
-        'operation': operationType.name,
-        'cross': cross.name,
-        'time_frame': INTERVAL,
-        'ema_main': SHORT_EMA,
-        'ema_second': LONG_EMA,
-        'CreateAT': datetime.now()
+       '_id': ObjectId(),
+       'symbol': operation.symbol,
+       'base': operation.base,
+       'quote': operation.quote,
+       'isMarginTrade': operation.isMarginTrade,
+       'isBuyAllowed': operation.isBuyAllowed,
+       'isSellAllowed': operation.isSellAllowed,
+       'open_price': float(price),
+       'close_price': None,
+       'open_date': datetime.now(),
+       'close_date': None,
+       'operation_number': operation.operation_number,
+       'cross': operation.cross.name,
+       'ema_main': MAIN_EMA,
+       'ema_second': operation.ema_second,
+       'time_frame': operation.time_frame,
+       'percent': 0,
+       'seconds': 0,
+       'status': operation.operation_type.name,
    }
    return collection.insert_one(EMA)
 
+
+def updateEMA(operation: Operation, coin: Operation):
+   print('UPDATE\n')
+   collection = getConnection()
+   open_price = coin['open_price']
+   close_price = getPrice(coin['symbol'])
+   open_date = coin['open_date']
+   close_date = datetime.now()
+   percent = round(diffPercent(open_price, close_price), 2)
+   time = diffTime(open_date, close_date)
+   EMA = {
+       '_id': coin['_id'],
+       'symbol': coin['symbol'],
+       'base': coin['base'],
+       'quote': coin['quote'],
+       'isMarginTrade': coin['isMarginTrade'],
+       'isBuyAllowed': operation.isBuyAllowed,
+       'isSellAllowed': operation.isSellAllowed,
+       'open_price': open_price,
+       'close_price': float(close_price),
+       'open_date': open_date,
+       'close_date': close_date,
+       'operation_number': coin['operation_number'],
+       'cross': coin['cross'],
+       'ema_main': MAIN_EMA,
+       'ema_second': coin['ema_second'],
+       'time_frame': coin['time_frame'],
+       'percent': percent,
+       'seconds': time.seconds,
+       'status': operation.operation_type.name,
+   }
+   return collection.update_one({'_id': coin['_id']}, {"$set": EMA}, upsert=False)
+
+
+def dropCollection():
+   collection = getConnection()
+   collection.drop()

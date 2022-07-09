@@ -1,5 +1,5 @@
 from enum import Enum
-class OperationType(Enum):
+class Status(Enum):
    OPEN = 1
    CLOSE = 2
 
