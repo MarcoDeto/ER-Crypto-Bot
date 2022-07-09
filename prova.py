@@ -5,7 +5,7 @@ from binance import BinanceSocketManager
 from binance.exceptions import BinanceAPIException, BinanceOrderException
 from binance.enums import *
 #from twisted.internet import reactor
-from config import api_key , api_secret
+from crypto_bot.config import api_key , api_secret
 
 client = Client(api_key, api_secret)
 client.ping()
