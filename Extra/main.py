@@ -1,7 +1,7 @@
 
 
 import shutil
-from config import SYMBOLS
+SYMBOLS = ['BTC', 'ETH', "BNB", "XRP", "ADA", "LUNA", "SOL", "AVAX", "DOT", "DOGE", "SHIB", "CAKE", "MATIC", "WBTC", "DAI", "LTC", "ATOM", "NEAR", "LINK", "UNI", "BCH", "ONE", "TRX", "FTT", "ETC", "LEO", "CELO", "ALGO", "XLM", "XRP", "MANA", "HBAR", "APE", "VET", "GALA"]
 
 
 def main(): 
@@ -11,8 +11,8 @@ def main():
             
 def createBot(symbol):
     try:
-        src = '/Users/marcodetomasi/WORK/bot/crypto_bot'
-        dst = '/Users/marcodetomasi/WORK/TESTs/' + symbol
+        src = '/WORK/ER-Crypto-Bot/Er_Crypto_Bot'
+        dst = '/WORK/TESTs/' + symbol
         file_path = dst + '/config.py'
         shutil.copytree(src, dst)
         f = open(file_path,"w")
@@ -25,8 +25,8 @@ def createBot(symbol):
         f.write("SYMBOLS = ['" + symbol + "']" + "\n")
         f.write("START_DATE = '1 July, 2022'")
         f.close()
-    except:
-        pass
+    except Exception as f:
+        print('main error: ', f)
 
 
 if __name__ == '__main__':
