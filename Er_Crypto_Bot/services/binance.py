@@ -1,5 +1,4 @@
 import string
-import time
 import numpy as np  # pip3 install numpy
 from binance.client import Client  # pip3 install python-binance
 from binance import BinanceSocketManager
@@ -32,7 +31,7 @@ def get_historical_klines(symbol: Operation, interval: string, startDate, endDat
     endDate = endDate.strftime("%d %B, %Y")
 
     data = client.get_historical_klines(symbol=symbol, interval=interval, start_str=startDate, end_str=endDate)
-    
+
     return data
 
 

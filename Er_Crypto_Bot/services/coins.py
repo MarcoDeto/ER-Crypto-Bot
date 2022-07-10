@@ -1,7 +1,6 @@
 from bson import ObjectId
 from models.enums import *
 from models.operation import Operation
-from services.mongoDB import getEMA
 
 SKIP_SYMBOLS = [
     'KP3RBTC',
