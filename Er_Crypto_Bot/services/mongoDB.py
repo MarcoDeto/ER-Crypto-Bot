@@ -6,7 +6,7 @@ from datetime import datetime
 import pymongo
 from config import CONNECTION_STRING, MAIN_EMA
 from models.operation import Operation
-from services.binance import diffPercent, diffTime, getPrice
+from services.binance import diffPercent, diffTime
 
 
 def getConnection():
@@ -69,7 +69,7 @@ def insertEMA(operation: Operation, candle):
 
 
 def updateEMA(operation: Operation, coin: Operation, candle):
-   print('UPDATE\n')
+   print('UPDATE')
    collection = getConnection()
    open_price = coin['open_price']
    open_date = coin['open_date']

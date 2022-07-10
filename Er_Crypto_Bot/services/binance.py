@@ -26,15 +26,13 @@ async def WebSocket(symbol):
     await client.close_connection()
 
 
-def get_historical_klines(symbol: Operation, interval: string):
+def get_historical_klines(symbol: Operation, interval: string, startDate, endDate):
 
-    data = client.get_historical_klines(symbol=symbol, interval=interval, start_str=START_DATE)#, end_str='9 July, 2022')
-    try: 
-        if int(client.response.headears['x-mbx-used-weight-'+interval]) > 1_000:
-            time.sleep(30)
-    except Exception as f:
-        print(f)
-        #time.sleep(30)
+    startDate = startDate.strftime("%d %B, %Y")
+    endDate = endDate.strftime("%d %B, %Y")
+
+    data = client.get_historical_klines(symbol=symbol, interval=interval, start_str=startDate, end_str=endDate)
+    
     return data
 
 

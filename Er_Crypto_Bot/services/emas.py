@@ -1,3 +1,4 @@
+from datetime import datetime
 import numpy as np
 from models.enums import CrossType, Status
 from services.coins import checkOperation, createOperation, updateOperation
@@ -21,7 +22,7 @@ def checkEMAs(data, coin, interval):
             ema_short = ema_short[-1]
             ema_long = ema_long[-1]
         except:
-            continue 
+            continue
 
         if (ema_short > ema_long and last_ema_short < last_ema_long):
             Long(data[len(data)-1], coin, second_ema, interval)
@@ -38,7 +39,7 @@ def getOperationDB(coin, second_ema, interval):
 
 def Long(candle, coin, second_ema, interval):
 
-    print('LONG'+' '+interval+' '+second_ema)
+    print('LONG'+' '+interval+' '+str(second_ema)+' '+str(datetime.fromtimestamp(candle[0]/1000.0)))
     coin = getOperationDB(coin, second_ema, interval)
     newOperation = createOperation(coin, CrossType.LONG, second_ema, interval)
     emaCross = checkOperation(coin, CrossType.LONG, newOperation)
@@ -53,7 +54,7 @@ def Long(candle, coin, second_ema, interval):
 
 def Short(candle, coin, second_ema, interval):
     
-    print('SHORT'+' '+interval+' '+second_ema)
+    print('SHORT'+' '+interval+' '+str(second_ema)+' '+str(datetime.fromtimestamp(candle[0]/1000.0)))
     coin = getOperationDB(coin, second_ema, interval)
     newOperation = createOperation(coin, CrossType.SHORT, second_ema, interval)
     emaCross = checkOperation(coin, CrossType.SHORT, newOperation)
@@ -68,9 +69,17 @@ def Short(candle, coin, second_ema, interval):
 
 def get_close_data(data):
     return_data = []
+    i = 0
     # prendendo i dati di chiusura per ogni kline
     for each in data:
-        # 4 è l'indice dei dati di chiusura in ogni kline
-        return_data.append(float(each[4]))
+        i = i + 1
+        value = each[4]
+        try: 
+            # 4 è l'indice dei dati di chiusura in ogni kline
+            value = float(each[4])
+            return_data.append(value)
+        except:
+            pass
+
     # ritornando come array numpy per una migliore precisione e prestazioni
     return np.array(return_data)
