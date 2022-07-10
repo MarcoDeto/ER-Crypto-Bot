@@ -4,17 +4,27 @@ from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
 
 import pymongo
-from Er_Crypto_Bot.config import SYMBOLS
+from config import SYMBOLS
 from config import CONNECTION_STRING, MAIN_EMA
 from models.operation import Operation
 from services.binance import diffPercent, diffTime
 
 
 def getConnection():
-   client = MongoClient(CONNECTION_STRING)
-   mongoDB = client['Er_Crypto_Bot']
-   collection = mongoDB[SYMBOLS[0]]
-   return collection
+   while True:
+      try:
+         client = MongoClient(CONNECTION_STRING)
+         mongoDB = client['Er_Crypto_Bot']
+         collection = mongoDB['EMAs']
+         return collection
+      except:
+         try:
+            response = input('\nPausing...  (Hit ENTER to continue, type quit to exit.)')
+            if response == 'quit':
+               break
+         except KeyboardInterrupt:
+               print('Resuming...')
+               continue
 
 
 def getEMAs():
@@ -30,7 +40,8 @@ def getEMAs():
 def getEMA(coin, second_ema, interval):
 
    collection = getConnection()
-   query = {'symbol': coin['symbol'], "ema_second": second_ema, 'time_frame': interval}
+   query = {'symbol': coin['symbol'],
+      "ema_second": second_ema, 'time_frame': interval}
    item_details = collection.find(query).sort('open_date', pymongo.DESCENDING)
    result = {}
    i = 0
@@ -104,4 +115,3 @@ def updateEMA(operation: Operation, coin: Operation, candle):
 def dropCollection():
    collection = getConnection()
    collection.drop()
-

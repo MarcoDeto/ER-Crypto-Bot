@@ -43,11 +43,11 @@ def main():
 def createBot(symbol):
     try: 
         # MacBook path
-        # src = '/Users/marcodetomasi/WORK/bot/crypto_bot'
-        # dst = '/Users/marcodetomasi/WORK/TESTs/' + symbol
+        src = '/Users/marcodetomasi/WORK/bot/Er_Crypto_Bot'
+        dst = '/Users/marcodetomasi/WORK/TESTs/' + symbol['base']
         # Windows path
-        src = '/WORK/ER-Crypto-Bot/Er_Crypto_Bot'
-        dst = '/WORK/TESTs/' + symbol['base']
+        # src = '/WORK/ER-Crypto-Bot/Er_Crypto_Bot'
+        # dst = '/WORK/TESTs/' + symbol['base']
         file_path = dst + '/config.py'
         shutil.copytree(src, dst)
         f = open(file_path,"w")
