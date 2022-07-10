@@ -9,7 +9,7 @@ from services.emas import checkEMAs
 
 def main():
     # cancello tutti i dati sul DB
-    dropCollection()
+    # dropCollection()
     print('\nSTART')
     print(datetime.now())
     Symbols = getSymbols()
