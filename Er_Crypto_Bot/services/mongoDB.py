@@ -4,6 +4,7 @@ from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
 
 import pymongo
+from Er_Crypto_Bot.config import SYMBOLS
 from config import CONNECTION_STRING, MAIN_EMA
 from models.operation import Operation
 from services.binance import diffPercent, diffTime
@@ -12,7 +13,7 @@ from services.binance import diffPercent, diffTime
 def getConnection():
    client = MongoClient(CONNECTION_STRING)
    mongoDB = client['Er_Crypto_Bot']
-   collection = mongoDB['EMAs']
+   collection = mongoDB[SYMBOLS[0]]
    return collection
 
 
