@@ -2,37 +2,37 @@
 
 import shutil
 SYMBOLS = [
-    {'BTC', '17 August, 2017'},
-    {'ETH', '17 August, 2017'},
-    {'BNB', '6 November, 2017'},
-    {'XRP', '4 May, 2018'},
-    {'ADA', '17 April, 2018'},
-    {'LUNA', '21 August, 2020'},
-    {'SOL', '11 August, 2020'},
-    {'AVAX', '22 September, 2020'},
-    {'DOT', '18 August, 2020'},
-    {'DOGE', '5 July, 2019'},
-    {'SHIB', '10 May, 2021'},
-    {'CAKE', '19 February, 2021'},
-    {'MATIC', '26 April, 2019'},
-    {'DAI', '11 August, 2020'},
-    {'LTC', '13 December, 2017'},
-    {'ATOM', '29 April, 2019'},
-    {'NEAR', '14 October, 2020'},
-    {'LINK', '16 January, 2019'},
-    {'UNI', '17 September, 2020'},
-    {'BCH', '28 November, 2019'},
-    {'ONE', '01 June, 2019'},
-    {'TRX', '11 June, 2018'},
-    {'ETC', '12 June, 2018'},
-    {'CELO', '05 January, 2021'},
-    {'ALGO', '22 June, 2019'},
-    {'XLM', '31 May, 2018'},
-    {'MANA', '06 August, 2020'},
-    {'HBAR', '29 November, 2019'},
-    {'APE', '17 March, 2022'},
-    {'VET', '25 July, 2018'},
-    {'GALA', '13 September, 2021'},
+    #{#'base': 'BTC', 'date': '17 August, 2017'},
+    {'base': 'ETH', 'date': '17 August, 2017'},
+    {'base': 'BNB', 'date': '6 November, 2017'},
+    {'base': 'XRP', 'date': '4 May, 2018'},
+    {'base': 'ADA', 'date': '17 April, 2018'},
+    {'base': 'LUNA', 'date': '21 August, 2020'},
+    {'base': 'SOL', 'date': '11 August, 2020'},
+    {'base': 'AVAX', 'date': '22 September, 2020'},
+    {'base': 'DOT', 'date': '18 August, 2020'},
+    {'base': 'DOGE', 'date': '5 July, 2019'},
+    {'base': 'SHIB', 'date': '10 May, 2021'},
+    {'base': 'CAKE', 'date': '19 February, 2021'},
+    {'base': 'MATIC', 'date': '26 April, 2019'},
+    {'base': 'DAI', 'date': '11 August, 2020'},
+    {'base': 'LTC', 'date': '13 December, 2017'},
+    {'base': 'ATOM', 'date': '29 April, 2019'},
+    {'base': 'NEAR', 'date': '14 October, 2020'},
+    {'base': 'LINK', 'date': '16 January, 2019'},
+    {'base': 'UNI', 'date': '17 September, 2020'},
+    {'base': 'BCH', 'date': '28 November, 2019'},
+    {'base': 'ONE', 'date': '01 June, 2019'},
+    {'base': 'TRX', 'date': '11 June, 2018'},
+    {'base': 'ETC', 'date': '12 June, 2018'},
+    {'base': 'CELO', 'date': '05 January, 2021'},
+    {'base': 'ALGO', 'date': '22 June, 2019'},
+    {'base': 'XLM', 'date': '31 May, 2018'},
+    {'base': 'MANA', 'date': '06 August, 2020'},
+    {'base': 'HBAR', 'date': '29 November, 2019'},
+    {'base': 'APE', 'date': '17 March, 2022'},
+    {'base': 'VET', 'date': '25 July, 2018'},
+    {'base': 'GALA', 'date': '13 September, 2021'},
 ]
 
 def main(): 
@@ -42,10 +42,12 @@ def main():
             
 def createBot(symbol):
     try: 
+        # MacBook path
         # src = '/Users/marcodetomasi/WORK/bot/crypto_bot'
         # dst = '/Users/marcodetomasi/WORK/TESTs/' + symbol
+        # Windows path
         src = '/WORK/ER-Crypto-Bot/Er_Crypto_Bot'
-        dst = '/WORK/TESTs/' + symbol[0]
+        dst = '/WORK/TESTs/' + symbol['base']
         file_path = dst + '/config.py'
         shutil.copytree(src, dst)
         f = open(file_path,"w")
@@ -55,8 +57,8 @@ def createBot(symbol):
         f.write("MAIN_EMA = 10" + "\n")
         f.write("api_key = 'ySBxTVFMkh3pGRyE1v8PqXXGbZoTcBs0eI2GuLvb99wjgWbQk3MiQxFjOH7SYqgC'" + "\n")
         f.write("api_secret = '6l2M7hMmg9AHprlFSMLER3xMSN735ioGgH69dY801aAKUvrNQs2KgP8JLLe9QSB7'" + "\n")
-        f.write("SYMBOLS = ['" + symbol[0] + "']" + "\n")
-        f.write("START_DATE = '" + symbol[1] + "'")
+        f.write("SYMBOLS = ['" + symbol['base'] + "']" + "\n")
+        f.write("START_DATE = '" + symbol['date'] + "'")
         f.close()
     except Exception as f:
         print('main error: ', f)
