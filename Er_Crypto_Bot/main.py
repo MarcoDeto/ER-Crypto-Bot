@@ -12,8 +12,8 @@ def main():
 
     loop.run_forever()
 
-    
-async def getDelay(interval):
+
+def getDelay(interval):
     match interval:
         case '1m':
             return .1
@@ -25,15 +25,20 @@ async def getDelay(interval):
             return 1.5
         case '30m':
             return 3
+        case '45m':
+            return 4.5
         case '1h':
             return 6
+        case '2h':
+            return 12
+        case '3h':
+            return 18
         case '4h':
             return 24
         case '1d':
             return 144
         case _:
             return 1
-
 
 async def intervaLoop(interval):
     
@@ -46,20 +51,13 @@ async def intervaLoop(interval):
     if (isToSkip(symbol)):
         return
         
-    delay = await getDelay(interval)
+    delay = getDelay(interval)
     while True:
         await asyncio.sleep(delay)
         print(datetime.now())
         print(interval + '\n')
-        data = await get_klines(symbol, interval)
-        await checkEMAs(data, coin, interval)
-
-
-def check_coount(interval, index):
-    if (index > 1200):
-        print('\nEND\n')
-        print(interval)
-        print(datetime.now())
+        candles = get_klines(symbol, interval)
+        checkEMAs(candles, coin, interval)
 
 
 if __name__ == '__main__':

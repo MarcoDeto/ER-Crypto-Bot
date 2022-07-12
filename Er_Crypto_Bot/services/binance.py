@@ -2,7 +2,7 @@ import string
 import numpy as np  # pip3 install numpy
 from binance.client import Client  # pip3 install python-binance
 from binance import BinanceSocketManager
-from config import INTERVALS, SYMBOLS, api_key, api_secret
+from config import *
 from models.operation import Operation
 
 client = Client(api_key, api_secret)
@@ -25,22 +25,21 @@ async def WebSocket(symbol):
     await client.close_connection()
 
 
-# otteniamo i dati di klines da elaborare
-async def get_klines(symbol: Operation, interval: string):
+def get_historical_klines(symbol: Operation, interval: string, startDate, endDate):
 
-    # test = client.get_historical_klines(symbol=symbol, interval=interval, start_str='1 Jan, 2019', end_str='2 Jan, 2019')
-    # if int(client.response.headears['x-mbx-used-weight-1m']) > 1_000:
-    #     time.sleep(30)
+    startDate = startDate.strftime("%d %B, %Y")
+    endDate = endDate.strftime("%d %B, %Y")
+
+    data = client.get_historical_klines(symbol=symbol, interval=interval, start_str=startDate, end_str=endDate)
+
+    return data
+
+
+# otteniamo i dati di klines da elaborare
+def get_klines(symbol: Operation, interval: string):
 
     data = client.get_klines(symbol=symbol, interval=interval, limit=300)
-    # più dati significa più precisione ma a un compromesso tra velocità e tempo
-    return_data = []
-    # prendendo i dati di chiusura per ogni kline
-    for each in data:
-        # 4 è l'indice dei dati di chiusura in ogni kline
-        return_data.append(float(each[4]))
-    # ritornando come array numpy per una migliore precisione e prestazioni
-    return np.array(return_data)
+    return data
 
 
 def getSymbols():
@@ -75,3 +74,4 @@ def diffPercent(Xi, Xf):
 
 def diffTime(open, close):
     return close - open
+
