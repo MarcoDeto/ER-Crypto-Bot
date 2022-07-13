@@ -69,7 +69,12 @@ def getPrice(symbol):
 
 def diffPercent(Xi, Xf):
     #[(Xf - Xi)/ Xi ] x 100 %
-    return ((float(Xf) - float(Xi)) / float(Xi)) * 100
+    if (Xf > Xi):
+        return ((float(Xf) - float(Xi)) / float(Xi)) * 100
+    if (Xi > Xf):
+        return ((float(Xi) - float(Xf)) / float(Xf)) * 100
+    else:
+        return 0
 
 
 def diffTime(open, close):

@@ -4,10 +4,9 @@ from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
 
 import pymongo
-from config import SYMBOLS
 from config import CONNECTION_STRING, MAIN_EMA
 from models.operation import Operation
-from services.binance import diffPercent, diffTime
+from services.binance import diffPercent, diffTime, getPrice
 
 
 def getConnection():
@@ -58,9 +57,9 @@ def insertEMA(operation: Operation, candle):
        'isMarginTrade': operation.isMarginTrade,
        'isBuyAllowed': operation.isBuyAllowed,
        'isSellAllowed': operation.isSellAllowed,
-       'open_price': float(candle[4]),
+       'open_price': float(getPrice(operation.symbol)),
        'close_price': None,
-       'open_date': datetime.fromtimestamp(candle[0]/1000.0),
+       'open_date': datetime.now(),
        'close_date': None,
        'operation_number': operation.operation_number,
        'cross': operation.cross.name,
@@ -79,7 +78,7 @@ def updateEMA(operation: Operation, coin: Operation, candle):
    collection = getConnection()
    open_price = coin['open_price']
    open_date = coin['open_date']
-   close_date = datetime.fromtimestamp(candle[0]/1000.0)
+   close_date = datetime.now()
    percent = round(diffPercent(open_price, candle[4]), 2)
    time = diffTime(open_date, close_date)
    EMA = {
@@ -91,7 +90,7 @@ def updateEMA(operation: Operation, coin: Operation, candle):
        'isBuyAllowed': operation.isBuyAllowed,
        'isSellAllowed': operation.isSellAllowed,
        'open_price': open_price,
-       'close_price': float(candle[4]),
+       'close_price': float(getPrice(coin['symbol'])),
        'open_date': open_date,
        'close_date': close_date,
        'operation_number': coin['operation_number'],
