@@ -10,10 +10,14 @@ from services.binance import diffPercent, diffTime, getPrice
 
 
 def getConnection():
-   client = MongoClient(CONNECTION_STRING)
-   mongoDB = client['ManTyres']
-   collection = mongoDB['EMAs']
-   return collection
+   while True:
+      try:
+         client = MongoClient(CONNECTION_STRING)
+         mongoDB = client['Er_Crypto_Bot']
+         collection = mongoDB['EMAs']
+         return collection
+      except:
+         continue
 
 
 def getEMAs():
@@ -29,7 +33,8 @@ def getEMAs():
 def getEMA(coin, second_ema, interval):
 
    collection = getConnection()
-   query = {'symbol': coin['symbol'], "ema_second": second_ema, 'time_frame': interval}
+   query = {'symbol': coin['symbol'],
+      "ema_second": second_ema, 'time_frame': interval}
    item_details = collection.find(query).sort('open_date', pymongo.DESCENDING)
    result = {}
    i = 0
@@ -41,11 +46,9 @@ def getEMA(coin, second_ema, interval):
    return result
 
 
-def insertEMA(operation: Operation):
+def insertEMA(operation: Operation, candle):
    print('INSERT\n')
    collection = getConnection()
-   symbol = operation.symbol
-   price = getPrice(symbol)
    EMA = {
        '_id': ObjectId(),
        'symbol': operation.symbol,
@@ -54,7 +57,7 @@ def insertEMA(operation: Operation):
        'isMarginTrade': operation.isMarginTrade,
        'isBuyAllowed': operation.isBuyAllowed,
        'isSellAllowed': operation.isSellAllowed,
-       'open_price': float(price),
+       'open_price': float(getPrice(operation.symbol)),
        'close_price': None,
        'open_date': datetime.now(),
        'close_date': None,
@@ -70,14 +73,13 @@ def insertEMA(operation: Operation):
    return collection.insert_one(EMA)
 
 
-def updateEMA(operation: Operation, coin: Operation):
-   print('UPDATE\n')
+def updateEMA(operation: Operation, coin: Operation, candle):
+   print('UPDATE')
    collection = getConnection()
    open_price = coin['open_price']
-   close_price = getPrice(coin['symbol'])
    open_date = coin['open_date']
    close_date = datetime.now()
-   percent = round(diffPercent(open_price, close_price), 2)
+   percent = round(diffPercent(open_price, candle[4]), 2)
    time = diffTime(open_date, close_date)
    EMA = {
        '_id': coin['_id'],
@@ -88,7 +90,7 @@ def updateEMA(operation: Operation, coin: Operation):
        'isBuyAllowed': operation.isBuyAllowed,
        'isSellAllowed': operation.isSellAllowed,
        'open_price': open_price,
-       'close_price': float(close_price),
+       'close_price': float(getPrice(coin['symbol'])),
        'open_date': open_date,
        'close_date': close_date,
        'operation_number': coin['operation_number'],
