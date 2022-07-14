@@ -68,11 +68,11 @@ def getPrice(symbol):
     return Cprz['price']
 
 
-def diffPercent(Xi, Xf):
+def diffPercent(Xi, Xf, cross):
     #[(Xf - Xi)/ Xi ] x 100 %
-    if (Xf > Xi):
+    if (cross == 'SHORT'):
         return ((float(Xf) - float(Xi)) / float(Xi)) * 100
-    if (Xi > Xf):
+    if (cross == 'LONG'):
         return ((float(Xi) - float(Xf)) / float(Xf)) * 100
     else:
         return 0
