@@ -57,7 +57,7 @@ async def intervaLoop(interval):
         print(datetime.now())
         print(interval + '\n')
         candles = get_klines(symbol, interval)
-        checkEMAs(candles, coin, interval)
+        await checkEMAs(candles, coin, interval)
 
 
 if __name__ == '__main__':

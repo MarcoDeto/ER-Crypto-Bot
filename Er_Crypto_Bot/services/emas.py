@@ -7,9 +7,9 @@ from config import MAIN_EMA, SECONDS_EMA
 import talib #pip3 install ta-lib
 
 
-def checkEMAs(data, coin, interval):
+async def checkEMAs(data, coin, interval):
 
-    close_prices = get_close_data(data)
+    close_prices = await get_close_data(data)
 
     for second_ema in SECONDS_EMA:
 
@@ -25,9 +25,9 @@ def checkEMAs(data, coin, interval):
             continue
 
         if (ema_short > ema_long and last_ema_short < last_ema_long):
-            Long(data[len(data)-1], coin, second_ema, interval)
+            await Long(coin, second_ema, interval)
         if (ema_short < ema_long and last_ema_short > last_ema_long):
-            Short(data[len(data)-1], coin, second_ema, interval)
+            await Short(coin, second_ema, interval)
 
 
 def getOperationDB(coin, second_ema, interval): 
@@ -37,37 +37,37 @@ def getOperationDB(coin, second_ema, interval):
     return coin
     
 
-def Long(candle, coin, second_ema, interval):
+async def Long(coin, second_ema, interval):
 
-    print('LONG'+' '+interval+' '+str(second_ema)+' '+str(datetime.fromtimestamp(candle[0]/1000.0)))
+    print('LONG'+' '+interval+' '+str(second_ema))
     coin = getOperationDB(coin, second_ema, interval)
     newOperation = createOperation(coin, CrossType.LONG, second_ema, interval)
     emaCross = checkOperation(coin, CrossType.LONG, newOperation)
     if (emaCross == False): return
 
     if (emaCross.operation_type == Status.CLOSE):
-        updateEMA(emaCross, coin, candle)
+        await updateEMA(emaCross, coin)
         emaCross = updateOperation(newOperation, coin, second_ema, interval)
 
-    insertEMA(emaCross, candle)
+    await insertEMA(emaCross)
         
 
-def Short(candle, coin, second_ema, interval):
+async def Short(coin, second_ema, interval):
     
-    print('SHORT'+' '+interval+' '+str(second_ema)+' '+str(datetime.fromtimestamp(candle[0]/1000.0)))
+    print('SHORT'+' '+interval+' '+str(second_ema))
     coin = getOperationDB(coin, second_ema, interval)
     newOperation = createOperation(coin, CrossType.SHORT, second_ema, interval)
     emaCross = checkOperation(coin, CrossType.SHORT, newOperation)
     if (emaCross == False): return
 
     if (emaCross.operation_type == Status.CLOSE):
-        updateEMA(emaCross, coin, candle)
+        await updateEMA(emaCross, coin)
         emaCross = updateOperation(newOperation, coin, second_ema, interval)
 
-    insertEMA(emaCross, candle)
+    await insertEMA(emaCross)
 
 
-def get_close_data(data):
+async def get_close_data(data):
     return_data = []
     # prendendo i dati di chiusura per ogni kline
     for each in data:

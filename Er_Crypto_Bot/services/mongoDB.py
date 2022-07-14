@@ -46,7 +46,7 @@ def getEMA(coin, second_ema, interval):
    return result
 
 
-def insertEMA(operation: Operation, candle):
+async def insertEMA(operation: Operation):
    print('INSERT\n')
    collection = getConnection()
    EMA = {
@@ -73,13 +73,14 @@ def insertEMA(operation: Operation, candle):
    return collection.insert_one(EMA)
 
 
-def updateEMA(operation: Operation, coin: Operation, candle):
+async def updateEMA(operation: Operation, coin: Operation):
    print('UPDATE')
    collection = getConnection()
    open_price = coin['open_price']
+   close_price = float(getPrice(coin['symbol']))
    open_date = coin['open_date']
    close_date = datetime.now()
-   percent = round(diffPercent(open_price, candle[4]), 2)
+   percent = round(diffPercent(open_price, close_price), 2)
    time = diffTime(open_date, close_date)
    EMA = {
        '_id': coin['_id'],
@@ -90,7 +91,7 @@ def updateEMA(operation: Operation, coin: Operation, candle):
        'isBuyAllowed': operation.isBuyAllowed,
        'isSellAllowed': operation.isSellAllowed,
        'open_price': open_price,
-       'close_price': float(getPrice(coin['symbol'])),
+       'close_price': close_price,
        'open_date': open_date,
        'close_date': close_date,
        'operation_number': coin['operation_number'],
