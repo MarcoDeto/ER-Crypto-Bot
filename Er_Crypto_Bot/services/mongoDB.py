@@ -80,7 +80,7 @@ async def updateEMA(operation: Operation, coin: Operation):
    close_price = float(getPrice(coin['symbol']))
    open_date = coin['open_date']
    close_date = datetime.now()
-   percent = round(diffPercent(open_price, close_price), 2)
+   percent = round(diffPercent(open_price, close_price, coin['cross']), 2)
    time = diffTime(open_date, close_date)
    EMA = {
        '_id': coin['_id'],
