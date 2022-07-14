@@ -1,26 +1,22 @@
 import asyncio
 from datetime import datetime
-from config import INTERVALS
+from services.emas import checkCycle
+from services.mongoDB import updateOperations
+from services.settings import getTimeframesCycle
+from config import CYCLETYPES
 from services.binance import get_klines, getSymbols
 from services.coins import isToSkip
-from services.emas import checkEMAs
 
 def main():
     loop = asyncio.get_event_loop()
-    for interval in INTERVALS:
-        loop.create_task(intervaLoop(interval))
+    for cycle in CYCLETYPES:
+        loop.create_task(cycleLoop(cycle))
 
     loop.run_forever()
 
 
-def getDelay(interval):
-    match interval:
-        case '1m':
-            return .1
-        case '3m':
-            return .3
-        case '5m':
-            return .5
+def getDelay(time_frame):
+    match time_frame:
         case '15m':
             return 1.5
         case '30m':
@@ -37,13 +33,15 @@ def getDelay(interval):
             return 24
         case '1d':
             return 144
+        case '3d':
+            return 432
         case _:
             return 1
 
-async def intervaLoop(interval):
-    
+async def cycleLoop(cycle):
+    await updateOperations()
     print('\nSTART')
-    print(interval)
+    print(cycle)
     print(datetime.now())
     Symbols = getSymbols()
     coin = Symbols[0]
@@ -51,13 +49,14 @@ async def intervaLoop(interval):
     if (isToSkip(symbol)):
         return
         
-    delay = getDelay(interval)
+    delay = getDelay(cycle)
     while True:
         await asyncio.sleep(delay)
         print(datetime.now())
-        print(interval + '\n')
-        candles = get_klines(symbol, interval)
-        await checkEMAs(candles, coin, interval)
+        print(cycle.name + '\n')
+        time_frame = getTimeframesCycle(cycle)
+        candles = get_klines(symbol, time_frame)
+        await checkCycle(candles, coin, cycle)
 
 
 if __name__ == '__main__':

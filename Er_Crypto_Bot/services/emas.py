@@ -7,7 +7,7 @@ from config import MAIN_EMA, SECONDS_EMA
 import talib #pip3 install ta-lib
 
 
-async def checkEMAs(data, coin, interval):
+async def checkCycle(data, coin, interval):
 
     close_prices = await get_close_data(data)
 

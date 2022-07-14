@@ -3,6 +3,7 @@ import numpy as np  # pip3 install numpy
 from binance.client import Client  # pip3 install python-binance
 from binance import BinanceSocketManager
 from config import *
+from models.enums import CrossType
 from models.operation import Operation
 
 client = Client(api_key, api_secret)
@@ -72,6 +73,16 @@ def diffPercent(Xi, Xf):
     if (Xf > Xi):
         return ((float(Xf) - float(Xi)) / float(Xi)) * 100
     if (Xi > Xf):
+        return ((float(Xi) - float(Xf)) / float(Xf)) * 100
+    else:
+        return 0
+
+
+def diffPercentUpdate(Xi, Xf, cross):
+    #[(Xf - Xi)/ Xi ] x 100 %
+    if (cross == 'LONG'):
+        return ((float(Xf) - float(Xi)) / float(Xi)) * 100
+    if (cross == 'SHORT'):
         return ((float(Xi) - float(Xf)) / float(Xf)) * 100
     else:
         return 0
