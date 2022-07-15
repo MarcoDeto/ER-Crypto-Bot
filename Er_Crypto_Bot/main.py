@@ -1,19 +1,51 @@
 import asyncio
 from datetime import datetime
+from models.enums import CycleType
 from services.emas import checkCycle
-from services.mongoDB import updateOperations
 from services.settings import getTimeframesCycle
-from config import CYCLETYPES
-from services.binance import get_klines, getSymbols
+from services.telegram import *
+from services.binance import get_klines, getStartCandle, getSymbols
 from services.coins import isToSkip
 
-def main():
-    loop = asyncio.get_event_loop()
-    for cycle in CYCLETYPES:
-        loop.create_task(cycleLoop(cycle))
 
-    loop.run_forever()
+async def cycleLoop(cycle, my_channel):
 
+    START = None
+    print('\nSTART')
+    print(cycle)
+    print(datetime.now())
+    Symbols = getSymbols()
+    coin = Symbols[0]
+    symbol = coin['symbol']
+    if (isToSkip(symbol)):
+        return
+    
+    while START == None:
+        START = input('INSERT NUMBER OF CANDLES TO BACK: ')
+        try:
+            START = int(START)
+        except:
+            START = None
+
+    TIME_FRAME = getTimeframesCycle(cycle)
+    START_CANDLE = getStartCandle(symbol, TIME_FRAME, START)
+    START = START_CANDLE
+
+    delay = getDelay(cycle)
+    while True:
+        await asyncio.sleep(delay)
+        print(datetime.now())
+        print(cycle.name + '\n')
+        
+        candles = get_klines(symbol, TIME_FRAME)
+        START_CANDLE = await checkCycle(START, candles, coin, cycle, my_channel)
+        if (START_CANDLE != START):
+            START = START_CANDLE
+            continue
+        
+
+
+        
 
 def getDelay(time_frame):
     match time_frame:
@@ -38,29 +70,15 @@ def getDelay(time_frame):
         case _:
             return 1
 
-async def cycleLoop(cycle):
-    await updateOperations()
-    print('\nSTART')
-    print(cycle)
-    print(datetime.now())
-    Symbols = getSymbols()
-    coin = Symbols[0]
-    symbol = coin['symbol']
-    if (isToSkip(symbol)):
-        return
-        
-    delay = getDelay(cycle)
-    while True:
-        await asyncio.sleep(delay)
-        print(datetime.now())
-        print(cycle.name + '\n')
-        time_frame = getTimeframesCycle(cycle)
-        candles = get_klines(symbol, time_frame)
-        await checkCycle(candles, coin, cycle)
 
+async def main():
 
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception as f:
-        print('main error: ', f)
+    await initTelegram()
+    my_channel = await getChannel()
+    # Schedule three calls *concurrently*:
+    L = await asyncio.gather(
+        cycleLoop(CycleType.Day, my_channel),
+    )
+    print(L)
+
+asyncio.run(main())

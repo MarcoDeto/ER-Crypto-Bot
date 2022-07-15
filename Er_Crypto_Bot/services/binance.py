@@ -3,15 +3,12 @@ import numpy as np  # pip3 install numpy
 from binance.client import Client  # pip3 install python-binance
 from binance import BinanceSocketManager
 from config import *
-from models.enums import CrossType
 from models.operation import Operation
-
-client = Client(api_key, api_secret)
-bm = BinanceSocketManager(client)
 
 
 async def WebSocket(symbol):
-
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
+    bm = BinanceSocketManager(client)
     # start any sockets here, i.e a trade socket
     ts = bm.trade_socket(symbol)
     # then start receiving messages
@@ -26,11 +23,22 @@ async def WebSocket(symbol):
     await client.close_connection()
 
 
+def getClient():
+    return Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
+
+
+def getStartCandle(symbol, time_frame, start):
+    client = getClient()
+    data = client.futures_klines(symbol=symbol, interval=time_frame, limit=300)
+    start_index = len(data) - 1 - start
+    return data[start_index][3]
+
+
 def get_historical_klines(symbol: Operation, interval: string, startDate, endDate):
 
     startDate = startDate.strftime("%d %B, %Y")
     endDate = endDate.strftime("%d %B, %Y")
-
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
     data = client.get_historical_klines(symbol=symbol, interval=interval, start_str=startDate, end_str=endDate)
 
     return data
@@ -38,12 +46,28 @@ def get_historical_klines(symbol: Operation, interval: string, startDate, endDat
 
 # otteniamo i dati di klines da elaborare
 def get_klines(symbol: Operation, interval: string):
+    client = getClient()
+    data = client.futures_klines(symbol=symbol, interval=interval, limit=300)
+    return data
 
-    data = client.get_klines(symbol=symbol, interval=interval, limit=300)
+
+def adjust_leverage(symbol):
+    client = getClient()
+    client.futures_change_leverage(symbol=symbol, leverage=10)
+
+def adjust_margintype(symbol):
+    client = getClient()
+    client.futures_change_margin_type(symbol=symbol, marginType='ISOLATED')
+
+def open_order(symbol, side, quantity):
+    client = getClient()
+    data = client.futures_create_order(symbol=symbol,type="MARKET",side=side,quantity=1500,)
+    #client.futures_create_order(symbol=symbol,type="LIMIT",timeInForce="GTC",side="SELL",price=sellPrice,quantity=quantity)
     return data
 
 
 def getSymbols():
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
     coin_list = client.get_all_isolated_margin_symbols()
     filtered = filter(
         lambda coin: coin['quote'] == 'USDT' or coin['quote'] == 'BTC', coin_list)
@@ -63,23 +87,12 @@ def getSymbols():
 
 
 def getPrice(symbol):
-
-    Cprz = client.get_symbol_ticker(symbol=symbol)
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
+    Cprz = client.futures_symbol_ticker(symbol=symbol)
     return Cprz['price']
 
 
 def diffPercent(Xi, Xf, cross):
-    #[(Xf - Xi)/ Xi ] x 100 %
-    if (cross == 'SHORT'):
-        return ((float(Xf) - float(Xi)) / float(Xi)) * 100
-    if (cross == 'LONG'):
-        return ((float(Xi) - float(Xf)) / float(Xf)) * 100
-    else:
-        return 0
-
-
-def diffPercentUpdate(Xi, Xf, cross):
-    #[(Xf - Xi)/ Xi ] x 100 %
     if (cross == 'LONG'):
         return ((float(Xf) - float(Xi)) / float(Xi)) * 100
     if (cross == 'SHORT'):

@@ -2,32 +2,33 @@ from datetime import datetime
 import numpy as np
 from models.enums import CrossType, Status
 from services.coins import checkOperation, createOperation, updateOperation
-from services.mongoDB import getEMA, insertEMA, updateEMA
-from config import MAIN_EMA, SECONDS_EMA 
-import talib #pip3 install ta-lib
+from services.conditions import getTimeframeOpenCheck
+from config import MAIN_EMA, SECOND_EMAS 
+import talib
+
+from services.settings import getMaxDays, getMinDays #pip3 install ta-lib
 
 
-async def checkCycle(data, coin, interval):
+async def checkCycle(start_price, data, coin, cycletype, my_channel):
 
-    close_prices = await get_close_data(data)
+    low_shadow_prices = await get_close_data(data)
+    check = checkOpen(start_price, cycletype, data)
+    # AGGIUNGERE IF CHECK != START PRIOCE
 
-    for second_ema in SECONDS_EMA:
+def checkOpen(start_price, cycletype, data):
 
-        ema_short = talib.EMA( close_prices, int(MAIN_EMA) )
-        ema_long = talib.EMA( close_prices, int(second_ema) )
-
-        try: 
-            last_ema_short  = ema_short[-2]
-            last_ema_long = ema_long[-2]
-            ema_short = ema_short[-1]
-            ema_long = ema_long[-1]
-        except:
-            continue
-
-        if (ema_short > ema_long and last_ema_short < last_ema_long):
-            await Long(coin, second_ema, interval)
-        if (ema_short < ema_long and last_ema_short > last_ema_long):
-            await Short(coin, second_ema, interval)
+    sub_cycle = getTimeframeOpenCheck(cycletype)
+    maxdays = getMaxDays(sub_cycle)
+    mindays = getMinDays(sub_cycle)
+    start_index = np.where(data == start_price)
+    start_range = start_index + mindays
+    end_range = start_index + maxdays
+    range = data[start_range:end_range]
+    for candle in range:
+        if (candle < start_price):
+            return candle
+        else:
+            return start_price
 
 
 def getOperationDB(coin, second_ema, interval): 
@@ -71,10 +72,10 @@ async def get_close_data(data):
     return_data = []
     # prendendo i dati di chiusura per ogni kline
     for each in data:
-        value = each[4]
+        value = each[3]
         try: 
             # 4 è l'indice dei dati di chiusura in ogni kline
-            value = float(each[4])
+            value = float(each[3])
             return_data.append(value)
         except:
             pass
