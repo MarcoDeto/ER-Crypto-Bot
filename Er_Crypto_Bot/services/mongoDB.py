@@ -4,7 +4,7 @@ from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
 
 import pymongo
-from config import CONNECTION_STRING, MAIN_EMA
+from config import CONNECTION_STRING
 from models.operation import Operation
 from services.binance import diffPercent, diffTime, getPrice
 
@@ -30,11 +30,15 @@ def getEMAs():
    return result
 
 
-def getEMA(coin, second_ema, interval):
+def getEMA(coin, main_ema, second_ema, interval):
 
    collection = getConnection()
-   query = {'symbol': coin['symbol'],
-      "ema_second": second_ema, 'time_frame': interval}
+   query = {
+      'symbol': coin['symbol'],
+      "ema_main": main_ema, 
+      "ema_second": second_ema, 
+      'time_frame': interval,
+   }
    item_details = collection.find(query).sort('open_date', pymongo.DESCENDING)
    result = {}
    i = 0
@@ -63,7 +67,7 @@ async def insertEMA(operation: Operation):
        'close_date': None,
        'operation_number': operation.operation_number,
        'cross': operation.cross.name,
-       'ema_main': MAIN_EMA,
+       'ema_main': operation.ema_main,
        'ema_second': operation.ema_second,
        'time_frame': operation.time_frame,
        'percent': 0,
@@ -96,7 +100,7 @@ async def updateEMA(operation: Operation, coin: Operation):
        'close_date': close_date,
        'operation_number': coin['operation_number'],
        'cross': coin['cross'],
-       'ema_main': MAIN_EMA,
+       'ema_main': coin['ema_main'],
        'ema_second': coin['ema_second'],
        'time_frame': coin['time_frame'],
        'percent': percent,
@@ -104,6 +108,59 @@ async def updateEMA(operation: Operation, coin: Operation):
        'status': operation.operation_type.name,
    }
    return collection.update_one({'_id': coin['_id']}, {"$set": EMA}, upsert=False)
+
+
+async def checkStopLoss(symbol, price):
+   collection = getConnection()
+   query = {
+      'symbol': symbol,
+      "status": 'OPEN', 
+      "status": 'LONG', 
+      'open_price': { '$lt': price },
+   }
+   item_details = collection.find(query)
+   result = []
+   for item in item_details:
+      result.append(item)
+      query = {
+      'symbol': symbol,
+      "status": 'OPEN', 
+      "status": 'SHORT', 
+      'open_price': { '$gt': price },
+   }
+   item_details = collection.find(query)
+   for operation in result:
+      print('STOP LOSS')
+      collection = getConnection()
+      open_price = operation['open_price']
+      close_price = float(getPrice(operation['symbol']))
+      open_date = operation['open_date']
+      close_date = datetime.now()
+      percent = round(diffPercent(open_price, close_price, operation['cross']), 2)
+      time = diffTime(open_date, close_date)
+      EMA = {
+         '_id': operation['_id'],
+         'symbol': operation['symbol'],
+         'base': operation['base'],
+         'quote': operation['quote'],
+         'isMarginTrade': operation['isMarginTrade'],
+         'isBuyAllowed': operation['isBuyAllowed'],
+         'isSellAllowed': operation['isSellAllowed'],
+         'open_price': open_price,
+         'close_price': close_price,
+         'open_date': open_date,
+         'close_date': close_date,
+         'operation_number': operation['operation_number'],
+         'cross': operation['cross'],
+         'ema_main': operation['ema_main'],
+         'ema_second': operation['ema_second'],
+         'time_frame': operation['time_frame'],
+         'percent': percent,
+         'seconds': time.seconds,
+         'status': operation['status'],
+      }
+      collection.update_one({'_id': operation['_id']}, {"$set": EMA}, upsert=False)
+
 
 
 def dropCollection():

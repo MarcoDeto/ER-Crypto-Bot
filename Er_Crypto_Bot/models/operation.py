@@ -1,6 +1,5 @@
 class Operation:
-   def __init__(self, _id, symbol, base, quote, isMarginTrade, isBuyAllowed, isSellAllowed, operation_number, cross, operation_type, second_ema, time_frame):
-               # _id, price, operation, cross, time_frame, ema_main, ema_second, CreateAT): 
+   def __init__(self, _id, symbol, base, quote, isMarginTrade, isBuyAllowed, isSellAllowed, operation_number, cross, operation_type, main_ema, second_ema, time_frame):
       self._id = _id
       self.symbol = symbol
       self.base = base
@@ -11,5 +10,6 @@ class Operation:
       self.operation_number = operation_number
       self.cross = cross
       self.operation_type = operation_type
-      self.time_frame = time_frame
+      self.ema_main = main_ema
       self.ema_second = second_ema
+      self.time_frame = time_frame

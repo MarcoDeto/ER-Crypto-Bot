@@ -33,18 +33,18 @@ def checkOperation(coin, cross, newOperation):
    return False
 
 
-def createOperation(coin, cross, second_ema, interval):
+def createOperation(coin, cross, main_ema, second_ema, interval):
    _id = ObjectId()
    return Operation(
        _id, coin['symbol'], coin['base'], coin['quote'],
        coin['isMarginTrade'], True, True, 0, cross,
-       Status.OPEN, second_ema, interval
+       Status.OPEN, main_ema, second_ema, interval
    )
 
 
-def updateOperation(newOperation: Operation, coin, second_ema, interval):
+def updateOperation(newOperation: Operation, coin, main_ema, second_ema, interval):
    newOperation.operation_number = getOperationNumber(
-       coin, Status.OPEN, second_ema, interval
+       coin, Status.OPEN, main_ema, second_ema, interval
    )
    newOperation.operation_type = Status.OPEN
    if (newOperation.cross == CrossType.LONG):
@@ -56,9 +56,10 @@ def updateOperation(newOperation: Operation, coin, second_ema, interval):
 
 def openLongOperation(newcoin: Operation, coin):
    second_ema = newcoin.ema_second
+   main_ema = newcoin.ema_main
    interval = newcoin.time_frame
    newcoin.operation_number = getOperationNumber(
-       coin, Status.OPEN, second_ema, interval
+       coin, Status.OPEN, main_ema, second_ema, interval
    )
    newcoin.isBuyAllowed = False
    return newcoin
@@ -66,9 +67,10 @@ def openLongOperation(newcoin: Operation, coin):
 
 def openShortOperation(newcoin: Operation, coin):
    second_ema = newcoin.ema_second
+   main_ema = newcoin.ema_main
    interval = newcoin.time_frame
    newcoin.operation_number = getOperationNumber(
-       coin, Status.OPEN, second_ema, interval
+       coin, Status.OPEN, main_ema, second_ema, interval
    )
    newcoin.isSellAllowed = False
    return newcoin
@@ -76,20 +78,19 @@ def openShortOperation(newcoin: Operation, coin):
 
 def closeOperation(newcoin: Operation, coin):
    second_ema = newcoin.ema_second
+   main_ema = newcoin.ema_main
    interval = newcoin.time_frame
    newcoin.operation_number = getOperationNumber(
-       coin, Status.CLOSE, second_ema, interval
+       coin, Status.CLOSE, main_ema, second_ema, interval
    )
    newcoin.operation_type = Status.CLOSE
    return newcoin
 
 
-def getOperationNumber(lastDBRow: Operation, operationType, second_ema, interval):
+def getOperationNumber(lastDBRow: Operation, operationType, main_ema, second_ema, interval):
    try:
-      if (operationType == Status.CLOSE and
-          interval == lastDBRow['time_frame'] and
-              second_ema == lastDBRow['ema_second']):
-
+      if (operationType == Status.CLOSE and interval == lastDBRow['time_frame'] and
+         second_ema == lastDBRow['ema_second'] and main_ema == lastDBRow['ema_main'] ):
          return lastDBRow['operation_number']
       else:
          return lastDBRow['operation_number'] + 1

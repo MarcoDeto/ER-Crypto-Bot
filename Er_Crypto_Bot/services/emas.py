@@ -2,8 +2,8 @@ from datetime import datetime
 import numpy as np
 from models.enums import CrossType, Status
 from services.coins import checkOperation, createOperation, updateOperation
-from services.mongoDB import getEMA, insertEMA, updateEMA
-from config import MAIN_EMA, SECONDS_EMA 
+from services.mongoDB import getEMA, insertEMA, checkStopLoss, updateEMA
+from config import MAIN_EMAS, SECOND_EMAS 
 import talib #pip3 install ta-lib
 
 
@@ -11,58 +11,62 @@ async def checkEMAs(data, coin, interval):
 
     close_prices = await get_close_data(data)
 
-    for second_ema in SECONDS_EMA:
+    priceToCheck = close_prices[len(close_prices) - 1]
+    await checkStopLoss(coin['symbol'], priceToCheck)
 
-        ema_short = talib.EMA( close_prices, int(MAIN_EMA) )
-        ema_long = talib.EMA( close_prices, int(second_ema) )
+    for main_ema in MAIN_EMAS:
+        for second_ema in SECOND_EMAS:
 
-        try: 
-            last_ema_short  = ema_short[-2]
-            last_ema_long = ema_long[-2]
-            ema_short = ema_short[-1]
-            ema_long = ema_long[-1]
-        except:
-            continue
+            ema_short = talib.EMA( close_prices, int(main_ema) )
+            ema_long = talib.EMA( close_prices, int(second_ema) )
 
-        if (ema_short > ema_long and last_ema_short < last_ema_long):
-            await Long(coin, second_ema, interval)
-        if (ema_short < ema_long and last_ema_short > last_ema_long):
-            await Short(coin, second_ema, interval)
+            try: 
+                last_ema_short  = ema_short[-2]
+                last_ema_long = ema_long[-2]
+                ema_short = ema_short[-1]
+                ema_long = ema_long[-1]
+            except:
+                continue
+
+            if (ema_short > ema_long and last_ema_short < last_ema_long):
+                await Long(coin, main_ema, second_ema, interval)
+            if (ema_short < ema_long and last_ema_short > last_ema_long):
+                await Short(coin, main_ema, second_ema, interval)
 
 
-def getOperationDB(coin, second_ema, interval): 
-    operationDB = getEMA(coin, second_ema, interval)
+def getOperationDB(coin, main_ema, second_ema, interval): 
+    operationDB = getEMA(coin, main_ema, second_ema, interval)
     if (operationDB):
         return operationDB
     return coin
     
 
-async def Long(coin, second_ema, interval):
+async def Long(coin, main_ema, second_ema, interval):
 
     print('LONG'+' '+interval+' '+str(second_ema))
-    coin = getOperationDB(coin, second_ema, interval)
-    newOperation = createOperation(coin, CrossType.LONG, second_ema, interval)
+    coin = getOperationDB(coin, main_ema, second_ema, interval)
+    newOperation = createOperation(coin, CrossType.LONG, main_ema, second_ema, interval)
     emaCross = checkOperation(coin, CrossType.LONG, newOperation)
     if (emaCross == False): return
 
     if (emaCross.operation_type == Status.CLOSE):
         await updateEMA(emaCross, coin)
-        emaCross = updateOperation(newOperation, coin, second_ema, interval)
+        emaCross = updateOperation(newOperation, coin, main_ema, second_ema, interval)
 
     await insertEMA(emaCross)
         
 
-async def Short(coin, second_ema, interval):
+async def Short(coin, main_ema, second_ema, interval):
     
     print('SHORT'+' '+interval+' '+str(second_ema))
-    coin = getOperationDB(coin, second_ema, interval)
-    newOperation = createOperation(coin, CrossType.SHORT, second_ema, interval)
+    coin = getOperationDB(coin, main_ema, second_ema, interval)
+    newOperation = createOperation(coin, CrossType.SHORT, main_ema, second_ema, interval)
     emaCross = checkOperation(coin, CrossType.SHORT, newOperation)
     if (emaCross == False): return
 
     if (emaCross.operation_type == Status.CLOSE):
         await updateEMA(emaCross, coin)
-        emaCross = updateOperation(newOperation, coin, second_ema, interval)
+        emaCross = updateOperation(newOperation, coin, main_ema, second_ema, interval)
 
     await insertEMA(emaCross)
 

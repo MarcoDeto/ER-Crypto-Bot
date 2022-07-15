@@ -1,11 +1,13 @@
 import asyncio
 from datetime import datetime
+from services.telegram import TelegramSend
 from config import INTERVALS
 from services.binance import get_klines, getSymbols
 from services.coins import isToSkip
 from services.emas import checkEMAs
 
 def main():
+    TelegramSend()
     loop = asyncio.get_event_loop()
     for interval in INTERVALS:
         loop.create_task(intervaLoop(interval))
