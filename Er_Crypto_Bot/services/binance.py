@@ -5,12 +5,10 @@ from binance import BinanceSocketManager
 from config import *
 from models.operation import Operation
 
-client = Client(api_key, api_secret)
-bm = BinanceSocketManager(client)
-
 
 async def WebSocket(symbol):
-
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
+    bm = BinanceSocketManager(client)
     # start any sockets here, i.e a trade socket
     ts = bm.trade_socket(symbol)
     # then start receiving messages
@@ -29,7 +27,7 @@ def get_historical_klines(symbol: Operation, interval: string, startDate, endDat
 
     startDate = startDate.strftime("%d %B, %Y")
     endDate = endDate.strftime("%d %B, %Y")
-
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
     data = client.get_historical_klines(symbol=symbol, interval=interval, start_str=startDate, end_str=endDate)
 
     return data
@@ -37,12 +35,28 @@ def get_historical_klines(symbol: Operation, interval: string, startDate, endDat
 
 # otteniamo i dati di klines da elaborare
 def get_klines(symbol: Operation, interval: string):
+    client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
+    data = client.futures_klines(symbol=symbol, interval=interval, limit=300)
+    return data
 
-    data = client.get_klines(symbol=symbol, interval=interval, limit=300)
+
+def adjust_leverage(symbol):
+    client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
+    client.futures_change_leverage(symbol=symbol, leverage=10)
+
+def adjust_margintype(symbol):
+    client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
+    client.futures_change_margin_type(symbol=symbol, marginType='ISOLATED')
+
+def open_order(symbol, side, quantity):
+    client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
+    data = client.futures_create_order(symbol=symbol,type="MARKET",side=side,quantity=1500,)
+    #client.futures_create_order(symbol=symbol,type="LIMIT",timeInForce="GTC",side="SELL",price=sellPrice,quantity=quantity)
     return data
 
 
 def getSymbols():
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
     coin_list = client.get_all_isolated_margin_symbols()
     filtered = filter(
         lambda coin: coin['quote'] == 'USDT' or coin['quote'] == 'BTC', coin_list)
@@ -62,8 +76,8 @@ def getSymbols():
 
 
 def getPrice(symbol):
-
-    Cprz = client.get_symbol_ticker(symbol=symbol)
+    client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
+    Cprz = client.futures_symbol_ticker(symbol=symbol)
     return Cprz['price']
 
 

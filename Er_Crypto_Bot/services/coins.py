@@ -1,4 +1,5 @@
 from bson import ObjectId
+from services.mongoDB import getOperationNumber
 from models.enums import *
 from models.operation import Operation
 
@@ -44,7 +45,7 @@ def createOperation(coin, cross, main_ema, second_ema, interval):
 
 def updateOperation(newOperation: Operation, coin, main_ema, second_ema, interval):
    newOperation.operation_number = getOperationNumber(
-       coin, Status.OPEN, main_ema, second_ema, interval
+       coin, main_ema, second_ema, interval
    )
    newOperation.operation_type = Status.OPEN
    if (newOperation.cross == CrossType.LONG):
@@ -59,7 +60,7 @@ def openLongOperation(newcoin: Operation, coin):
    main_ema = newcoin.ema_main
    interval = newcoin.time_frame
    newcoin.operation_number = getOperationNumber(
-       coin, Status.OPEN, main_ema, second_ema, interval
+       coin, main_ema, second_ema, interval
    )
    newcoin.isBuyAllowed = False
    return newcoin
@@ -70,7 +71,7 @@ def openShortOperation(newcoin: Operation, coin):
    main_ema = newcoin.ema_main
    interval = newcoin.time_frame
    newcoin.operation_number = getOperationNumber(
-       coin, Status.OPEN, main_ema, second_ema, interval
+       coin, main_ema, second_ema, interval
    )
    newcoin.isSellAllowed = False
    return newcoin
@@ -81,13 +82,13 @@ def closeOperation(newcoin: Operation, coin):
    main_ema = newcoin.ema_main
    interval = newcoin.time_frame
    newcoin.operation_number = getOperationNumber(
-       coin, Status.CLOSE, main_ema, second_ema, interval
+       coin, main_ema, second_ema, interval
    )
    newcoin.operation_type = Status.CLOSE
    return newcoin
 
 
-def getOperationNumber(lastDBRow: Operation, operationType, main_ema, second_ema, interval):
+def OLDgetOperationNumber(lastDBRow: Operation, operationType, main_ema, second_ema, interval):
    try:
       if (operationType == Status.CLOSE and interval == lastDBRow['time_frame'] and
          second_ema == lastDBRow['ema_second'] and main_ema == lastDBRow['ema_main'] ):

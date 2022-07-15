@@ -15,65 +15,48 @@
 
 #    bot.sendPhoto(receiver_id, photo=open('test_img.png', 'rb')) # send message to telegram
 
-
-import json
-from datetime import date, datetime
-
+import time
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
-from telethon.tl.functions.messages import (GetHistoryRequest)
-from telethon.tl.types import (
-    PeerChannel
-)
 
-TELEGRAM_TOKEN = "5554013164:AAEaxjGrj2KHUbGuSz9MCH4aeKGcy7c28Ao"
+from config import TELEGRAM_API_HASH, TELEGRAM_API_ID, TELEGRAM_CHANNEL, TELEGRAM_PHONE, TELEGRAM_USERBNAME
 
+client = TelegramClient(TELEGRAM_USERBNAME, TELEGRAM_API_ID, TELEGRAM_API_HASH)
 
-# some functions to parse json date
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, datetime):
-            return o.isoformat()
+async def initTelegram():
 
-        if isinstance(o, bytes):
-            return list(o)
-
-        return json.JSONEncoder.default(self, o)
-
-
-# Reading Configs
-
-# Setting configuration values
-api_id = 18943005
-api_hash = '15b0d68a8f31361f902ddd4f11c30d1f'
-
-api_hash = str(api_hash)
-
-phone = "+39 3342927723"
-username =  "blingus"
-
-# Create the client and connect
-client = TelegramClient(username, api_id, api_hash)
-
-async def main(phone):
     await client.start()
-    print("Client Created")
+    print("Telegram Client Created")
     # Ensure you're authorized
     if await client.is_user_authorized() == False:
-        await client.send_code_request(phone)
+        await client.send_code_request(TELEGRAM_PHONE)
         try:
-            await client.sign_in(phone, input('Enter the code: '))
+            await client.sign_in(TELEGRAM_PHONE, input('Enter the code: '))
         except SessionPasswordNeededError:
             await client.sign_in(password=input('Password: '))
 
-    me = await client.get_me()
+async def getChannel():
+    return await client.get_entity(TELEGRAM_CHANNEL)
+    
 
-    my_channel = await client.get_entity("https://t.me/ercryptobotto")
+async def sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, seconds):
+    
+    minutes = round(seconds / 60, 1)
+    order = '**ORDER CLOSE** ✅\n\n'
+    symbolCross = '**' + symbol + ' - BUY 🟢'
+    openDate = '\nOPEN DATE**:   ' + str(open_date) + ' 🗓'
+    openPrice = '\n**OPEN PRICE**: ' + str(open_price) + ' 🛒'
+    closePrice = '\n**CLOSE PRICE**: ' + str(close_price) + ' ✋🏼'
+    profit = '\n**PROFIT**: ' + str(percent) + '% 🤑'
+    duration = '\n**TIME**: ' + str(minutes) + 'm ⏰'
 
-    test = await client.send_message(my_channel, "message test")
+    if (cross == 'SHORT'):
+        symbolCross = '**' + symbol + '**' + ' - SELL 🔴**'
+    if (percent < 0):
+        order = '**ORDER CLOSE** ❌\n\n'
 
+    message = order + symbolCross + openDate + openPrice + closePrice + profit + duration
 
-with client:
-    client.loop.run_until_complete(main(phone))
+    await client.send_message(my_channel, message)
 
 

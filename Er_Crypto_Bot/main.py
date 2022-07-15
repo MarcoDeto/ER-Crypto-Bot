@@ -1,22 +1,33 @@
 import asyncio
 from datetime import datetime
-from services.telegram import TelegramSend
+from services.telegram import *
 from config import INTERVALS
 from services.binance import get_klines, getSymbols
 from services.coins import isToSkip
 from services.emas import checkEMAs
 
-def main():
-    TelegramSend()
-    loop = asyncio.get_event_loop()
-    for interval in INTERVALS:
-        loop.create_task(intervaLoop(interval))
+async def intervaLoop(interval, my_channel):
+    
+    print('\nSTART')
+    print(interval)
+    print(datetime.now())
+    Symbols = getSymbols()
+    coin = Symbols[0]
+    symbol = coin['symbol']
+    if (isToSkip(symbol)):
+        return
+        
+    delay = getDelay(interval)
+    while True:
+        await asyncio.sleep(delay)
+        print(datetime.now())
+        print(interval + '\n')
+        candles = get_klines(symbol, interval)
+        await checkEMAs(candles, coin, interval, my_channel)
 
-    loop.run_forever()
 
-
-def getDelay(interval):
-    match interval:
+def getDelay(time_frame):
+    match (time_frame):
         case '1m':
             return .1
         case '3m':
@@ -42,28 +53,23 @@ def getDelay(interval):
         case _:
             return 1
 
-async def intervaLoop(interval):
-    
-    print('\nSTART')
-    print(interval)
-    print(datetime.now())
-    Symbols = getSymbols()
-    coin = Symbols[0]
-    symbol = coin['symbol']
-    if (isToSkip(symbol)):
-        return
-        
-    delay = getDelay(interval)
-    while True:
-        await asyncio.sleep(delay)
-        print(datetime.now())
-        print(interval + '\n')
-        candles = get_klines(symbol, interval)
-        await checkEMAs(candles, coin, interval)
 
+async def main():
 
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception as f:
-        print('main error: ', f)
+    await initTelegram()
+    my_channel = await getChannel()
+    # Schedule three calls *concurrently*:
+    L = await asyncio.gather(
+        intervaLoop('1m', my_channel),
+        intervaLoop('3m', my_channel),
+        intervaLoop('5m', my_channel),
+        intervaLoop('15m', my_channel),
+        intervaLoop('30m', my_channel),
+        intervaLoop('1h', my_channel),
+        intervaLoop('2h', my_channel),
+        intervaLoop('4h', my_channel),
+        intervaLoop('1d', my_channel),
+    )
+    print(L)
+
+asyncio.run(main())
