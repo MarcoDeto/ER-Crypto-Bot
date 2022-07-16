@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from time import sleep
 from services.telegram import *
 from config import INTERVALS
 from services.binance import get_klines, getSymbols
@@ -60,8 +61,8 @@ async def main():
     my_channel = await getChannel()
     # Schedule three calls *concurrently*:
     L = await asyncio.gather(
-        intervaLoop('1m', my_channel),
-        intervaLoop('3m', my_channel),
+        #intervaLoop('1m', my_channel),
+        #intervaLoop('3m', my_channel),
         intervaLoop('5m', my_channel),
         intervaLoop('15m', my_channel),
         intervaLoop('30m', my_channel),

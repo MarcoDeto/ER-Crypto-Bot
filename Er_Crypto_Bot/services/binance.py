@@ -35,10 +35,9 @@ def get_historical_klines(symbol: Operation, interval: string, startDate, endDat
 
 # otteniamo i dati di klines da elaborare
 def get_klines(symbol: Operation, interval: string):
-    client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
+    client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=False)
     data = client.futures_klines(symbol=symbol, interval=interval, limit=300)
     return data
-
 
 def adjust_leverage(symbol):
     client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
@@ -50,6 +49,7 @@ def adjust_margintype(symbol):
 
 def open_order(symbol, side, quantity):
     client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
+    return None
     data = client.futures_create_order(symbol=symbol,type="MARKET",side=side,quantity=1500,)
     #client.futures_create_order(symbol=symbol,type="LIMIT",timeInForce="GTC",side="SELL",price=sellPrice,quantity=quantity)
     return data

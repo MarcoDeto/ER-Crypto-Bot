@@ -87,6 +87,7 @@ async def insertEMA(operation: Operation):
        'percent': 0,
        'seconds': 0,
        'status': operation.operation_type.name,
+       'stop_loss': False
    }
    collection.insert_one(EMA)
    #adjust_leverage(operation.symbol)
@@ -128,6 +129,7 @@ async def updateEMA(operation: Operation, coin: Operation, my_channel):
        'percent': percent,
        'seconds': time.seconds,
        'status': operation.operation_type.name,
+       'stop_loss': False
    }
    collection.update_one({'_id': coin['_id']}, {"$set": EMA}, upsert=False)
    #adjust_leverage(symbol)
@@ -139,25 +141,29 @@ async def updateEMA(operation: Operation, coin: Operation, my_channel):
    await sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, time.seconds)
 
 
-async def checkStopLoss(symbol, price):
+async def checkStopLoss(symbol, price, my_channel):
    collection = getConnection()
    query = {
       'symbol': symbol,
       "status": 'OPEN', 
       "cross": 'LONG', 
       'open_price': { '$lt': price },
+      'close_price': { '$eq': None }
    }
    item_details = collection.find(query)
    result = []
    for item in item_details:
       result.append(item)
-      query = {
+   query = {
       'symbol': symbol,
       "status": 'OPEN', 
       "cross": 'SHORT', 
       'open_price': { '$gt': price },
+      'close_price': { '$eq': None }
    }
    item_details = collection.find(query)
+   for item in item_details:
+      result.append(item)
    for operation in result:
       print('STOP LOSS')
       collection = getConnection()
@@ -173,8 +179,8 @@ async def checkStopLoss(symbol, price):
          'base': operation['base'],
          'quote': operation['quote'],
          'isMarginTrade': operation['isMarginTrade'],
-         'isBuyAllowed': operation['isBuyAllowed'],
-         'isSellAllowed': operation['isSellAllowed'],
+         'isBuyAllowed': True,
+         'isSellAllowed': True,
          'open_price': open_price,
          'close_price': close_price,
          'open_date': open_date,
@@ -187,8 +193,10 @@ async def checkStopLoss(symbol, price):
          'percent': percent,
          'seconds': time.seconds,
          'status': operation['status'],
+         'stop_loss': True
       }
       collection.update_one({'_id': operation['_id']}, {"$set": EMA}, upsert=False)
+      await sendMessage(my_channel, symbol, operation['cross'], open_date, open_price, close_price, percent, time.seconds, stop_loss=True)
 
 
 
