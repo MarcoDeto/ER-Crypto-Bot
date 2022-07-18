@@ -3,9 +3,9 @@
 import numpy
 import talib
 
-def RSIIsAlert(close):
-   rsi = talib.RSI(close)
-   if (rsi > 80 or rsi < 20):
+def RSIIsAlert(close_prices):
+   rsi = talib.RSI(close_prices, 5)
+   if (rsi[len(rsi) - 1] > 80 or rsi[len(rsi) - 1] < 20):
       return True
    else:
       return False
