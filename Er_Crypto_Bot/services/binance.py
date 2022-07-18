@@ -34,7 +34,7 @@ def get_historical_klines(symbol: Operation, interval: string, startDate, endDat
 
 
 # otteniamo i dati di klines da elaborare
-def get_klines(symbol: Operation, interval: string):
+def get_klines(symbol, interval):
     client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=False)
     data = client.futures_klines(symbol=symbol, interval=interval, limit=300)
     return data

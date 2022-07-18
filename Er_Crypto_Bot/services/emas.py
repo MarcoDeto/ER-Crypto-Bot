@@ -3,14 +3,19 @@ import numpy as np
 from services.binance import getPrice
 from models.enums import CrossType, Status
 from services.coins import checkOperation, createOperation, updateOperation
+from services.ichimoku import getIchimoku
 from services.mongoDB import getEMA, insertEMA, checkStopLoss, updateEMA
 from config import MAIN_EMAS, SECOND_EMAS 
-import talib #pip3 install ta-lib
+import talib
+
+from services.rsi import RSIIsAlert #pip3 install ta-lib
 
 
 async def checkEMAs(data, coin, interval, my_channel):
 
     close_prices = await get_close_data(data)
+    RSIIsAlert(close_prices)
+    getIchimoku(data)
 
     priceToCheck = getPrice(coin['symbol'])
     await checkStopLoss(coin['symbol'], priceToCheck, my_channel)

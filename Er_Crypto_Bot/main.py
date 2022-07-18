@@ -55,19 +55,20 @@ def getDelay(time_frame):
 
 async def main():
 
-    await initTelegram()
-    my_channel = await getChannel()
+    # await initTelegram()
+    # my_channel = await getChannel()
+    my_channel = None
     # Schedule three calls *concurrently*:
     L = await asyncio.gather(
         intervaLoop('1m', my_channel),
-        intervaLoop('3m', my_channel),
-        intervaLoop('5m', my_channel),
-        intervaLoop('15m', my_channel),
-        intervaLoop('30m', my_channel),
-        intervaLoop('1h', my_channel),
-        intervaLoop('2h', my_channel),
-        intervaLoop('4h', my_channel),
-        intervaLoop('1d', my_channel),
+        # intervaLoop('3m', my_channel),
+        # intervaLoop('5m', my_channel),
+        # intervaLoop('15m', my_channel),
+        # intervaLoop('30m', my_channel),
+        # intervaLoop('1h', my_channel),
+        # intervaLoop('2h', my_channel),
+        # intervaLoop('4h', my_channel),
+        # intervaLoop('1d', my_channel),
     )
     print(L)
 
