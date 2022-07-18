@@ -138,27 +138,30 @@ async def updateEMA(operation: Operation, coin: Operation, my_channel):
       open_order(symbol, 'SELL', 10)
    if (cross == 'SHORT'):
       open_order(symbol, 'BUY', 10)
-   await sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, time.seconds)
+   await sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, time.seconds, coin['time_frame'], coin['ema_second'])
 
 
 async def checkStopLoss(symbol, price, my_channel):
+   
    collection = getConnection()
+   long_price_max = (float(price) + (float(price) * 0.5 / 100))
    query = {
       'symbol': symbol,
       "status": 'OPEN', 
       "cross": 'LONG', 
-      'open_price': { '$lt': price },
+      'open_price': { '$gt': long_price_max },
       'close_price': { '$eq': None }
    }
    item_details = collection.find(query)
    result = []
    for item in item_details:
       result.append(item)
+   long_price_min = (float(price) - (float(price) * 0.5 / 100))
    query = {
       'symbol': symbol,
       "status": 'OPEN', 
       "cross": 'SHORT', 
-      'open_price': { '$gt': price },
+      'open_price': { '$lt': long_price_min },
       'close_price': { '$eq': None }
    }
    item_details = collection.find(query)
@@ -192,11 +195,11 @@ async def checkStopLoss(symbol, price, my_channel):
          'time_frame': operation['time_frame'],
          'percent': percent,
          'seconds': time.seconds,
-         'status': operation['status'],
+         'status': 'CLOSE',
          'stop_loss': True
       }
       collection.update_one({'_id': operation['_id']}, {"$set": EMA}, upsert=False)
-      await sendMessage(my_channel, symbol, operation['cross'], open_date, open_price, close_price, percent, time.seconds, stop_loss=True)
+      await sendMessage(my_channel, symbol, operation['cross'], open_date, open_price, close_price, percent, time.seconds, operation['time_frame'], operation['ema_second'], stop_loss=True)
 
 
 

@@ -1,3 +1,4 @@
+import time
 import numpy as np
 from services.binance import getPrice
 from models.enums import CrossType, Status
@@ -32,9 +33,9 @@ async def checkEMAs(data, coin, interval, my_channel):
                 continue
 
             if (ema_short > ema_long and last_ema_short < last_ema_long):
-                await Long(coin, main_ema, second_ema, interval, my_channel)
-            if (ema_short < ema_long and last_ema_short > last_ema_long):
                 await Short(coin, main_ema, second_ema, interval, my_channel)
+            if (ema_short < ema_long and last_ema_short > last_ema_long):
+                await Long(coin, main_ema, second_ema, interval, my_channel)
 
 
 def getOperationDB(coin, main_ema, second_ema, interval): 

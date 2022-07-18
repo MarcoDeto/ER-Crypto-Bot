@@ -39,9 +39,9 @@ async def getChannel():
     return await client.get_entity(TELEGRAM_CHANNEL)
     
 
-async def sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, seconds, stop_loss = False):
+async def sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, seconds, time_frame, second_ema, stop_loss = False):
     
-    minutes = round(seconds / 60, 1)
+    minutes = round(int(seconds) / 60, 1)
     order = '**ORDER CLOSE** ✅\n\n'
     symbolCross = '**' + symbol + ' - BUY 🟢'
     openDate = '\nOPEN DATE**:   ' + str(open_date) + ' 🗓'
@@ -49,15 +49,18 @@ async def sendMessage(my_channel, symbol, cross, open_date, open_price, close_pr
     closePrice = '\n**CLOSE PRICE**: ' + str(close_price) + ' ✋🏼'
     profit = '\n**PROFIT**: ' + str(percent) + '% 🤑'
     duration = '\n**TIME**: ' + str(minutes) + 'm ⏰'
+    interval = '\n**TIME FRANE**: ' + str(time_frame)
+    ema_second = '\n**SECOND EMA**: ' + str(second_ema)
 
     if (cross == 'SHORT'):
-        symbolCross = '**' + symbol + '**' + ' - SELL 🔴**'
+        symbolCross = '**' + symbol + ' - SELL 🔴'
     if (percent < 0):
         order = '**ORDER CLOSE** ❌\n\n'
+        profit = '\n**PROFIT**: ' + str(percent) + '% 😔'
     if (stop_loss == True):
         order = '**STOP LOSS** ❌\n\n'
 
-    message = order + symbolCross + openDate + openPrice + closePrice + profit + duration
+    message = order + symbolCross + openDate + openPrice + closePrice + profit + duration + interval + ema_second
 
     await client.send_message(my_channel, message)
 
