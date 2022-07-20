@@ -3,3 +3,4 @@
 __pycache__
 # macOS Files
 .DS_Store
+.log
