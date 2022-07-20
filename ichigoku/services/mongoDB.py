@@ -4,6 +4,9 @@ from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
 
 import pymongo
+from services.bybit import *
+from services.tradingview import *
+from services.messages import *
 from services.telegram import *
 from config import CONNECTION_STRING
 from models.operation import Operation
@@ -51,8 +54,23 @@ def getOperationNumber(coin, interval):
    return result + 1
 
 
-def insertIchiGoku(operation: Operation):
+def checkIfOpen(coin, interval):
+   query = {
+      'symbol': coin['symbol'],
+      'time_frame': interval,
+      'close_price': { '$ne': None },
+      "status": 'OPEN', 
+      "cross": coin['cross'],
+   }
+   count = collection.find(query).sort('open_date', pymongo.ASCENDING)
+   if (len(count) > 0):
+      return count[0]
+   return None
+
+
+def insertIchiGoku(operation: Operation, my_channel):
    print('INSERT\n')
+   open_price = float(getPrice(operation.symbol))
    ichimoku = {
        '_id': ObjectId(),
        'symbol': operation.symbol,
@@ -61,7 +79,7 @@ def insertIchiGoku(operation: Operation):
        'isMarginTrade': operation.isMarginTrade,
        'isBuyAllowed': operation.isBuyAllowed,
        'isSellAllowed': operation.isSellAllowed,
-       'open_price': float(getPrice(operation.symbol)),
+       'open_price': open_price,
        'close_price': None,
        'open_date': datetime.now(),
        'close_date': None,
@@ -77,9 +95,13 @@ def insertIchiGoku(operation: Operation):
    #adjust_leverage(operation.symbol)
    #adjust_margintype(operation.symbol)
    if (operation.cross.name == 'LONG'):
-      open_order(operation.symbol, 'BUY', 10)
-   if (operation.cross.name == 'SHORT'):
-      open_order(operation.symbol, 'SELL', 10)
+      open_binance_order(operation.symbol, 10)
+      link = get_trading_view_graph(operation.time_frame, operation.symbol, 'BINANCE')
+   elif(operation.cross.name == 'SHORT'):
+      open_bybit_order(operation.symbol, 10)
+      link = get_trading_view_graph(operation.time_frame, operation.symbol, 'BYBIT')
+
+   send_open_messages(my_channel, operation.symbol, operation.cross.name, open_price, link, operation.time_frame)
 
 
 def updateIchiGoku(operation: Operation, coin: Operation, my_channel):
@@ -92,6 +114,7 @@ def updateIchiGoku(operation: Operation, coin: Operation, my_channel):
    cross = coin['cross']
    percent = round(diffPercent(open_price, close_price, cross), 2)
    time = diffTime(open_date, close_date)
+   interval = coin['time_frame']
    ichimoku = {
        '_id': coin['_id'],
        'symbol': symbol,
@@ -106,20 +129,22 @@ def updateIchiGoku(operation: Operation, coin: Operation, my_channel):
        'close_date': close_date,
        'operation_number': coin['operation_number'],
        'cross': cross,
-       'time_frame': coin['time_frame'],
+       'time_frame': interval,
        'percent': percent,
        'seconds': time.seconds,
        'status': operation.operation_type.name,
        'stop_loss': False
    }
    collection.update_one({'_id': coin['_id']}, {"$set": ichimoku}, upsert=False)
-   #adjust_leverage(symbol)
-   #adjust_margintype(symbol)
+
    if (cross == 'LONG'):
-      open_order(symbol, 'SELL', 10)
-   if (cross == 'SHORT'):
-      open_order(symbol, 'BUY', 10)
-   sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, time.seconds, coin['time_frame'])
+      open_binance_order(symbol, 10)
+      link = get_trading_view_graph(interval, symbol, 'BINANCE')
+   elif(cross == 'SHORT'):
+      open_bybit_order(symbol, 10)
+      link = get_trading_view_graph(interval, symbol, 'BYBIT')
+   
+   send_close_messages(my_channel, link, symbol, cross, open_date, open_price, close_price, percent, time.seconds, coin['time_frame'])
 
 
 def checkTakeProfit(symbol, interval, price, kijun_sen, my_channel):
@@ -176,7 +201,15 @@ def checkTakeProfit(symbol, interval, price, kijun_sen, my_channel):
          'stop_loss': False
       }
       collection.update_one({'_id': operation['_id']}, {"$set": ichimoku}, upsert=False)
-      sendMessage(my_channel, symbol, operation['cross'], open_date, open_price, float(price), percent, time.seconds, operation['time_frame'], stop_loss=False)
+
+      if (operation['cross'] == 'LONG'):
+         open_binance_order(operation['symbol'], 10)
+         link = get_trading_view_graph(operation['time_frame'], operation['symbol'], 'BINANCE')
+      elif(operation['cross'] == 'SHORT'):
+         open_bybit_order(operation['symbol'], 10)
+         link = get_trading_view_graph(operation['time_frame'], operation['symbol'], 'BYBIT')
+
+      send_close_messages(my_channel, link, symbol, operation['cross'], open_date, open_price, float(price), percent, time.seconds, operation['time_frame'], stop_loss=False)
 
 
 def checkStopLoss(symbol, price, my_channel):
@@ -232,7 +265,15 @@ def checkStopLoss(symbol, price, my_channel):
          'stop_loss': True
       }
       collection.update_one({'_id': operation['_id']}, {"$set": ichimoku}, upsert=False)
-      sendMessage(my_channel, symbol, operation['cross'], open_date, open_price, float(price), percent, time.seconds, operation['time_frame'], stop_loss=True)
+
+      if (operation['cross'] == 'LONG'):
+         open_binance_order(operation['symbol'], 10)
+         link = get_trading_view_graph(operation['time_frame'], operation['symbol'], 'BINANCE')
+      elif(operation['cross'] == 'SHORT'):
+         open_bybit_order(operation['symbol'], 10)
+         link = get_trading_view_graph(operation['time_frame'], operation['symbol'], 'BYBIT')
+
+      send_close_messages(my_channel, link, symbol, operation['cross'], open_date, open_price, float(price), percent, time.seconds, operation['time_frame'], stop_loss=True)
 
 
 

@@ -20,16 +20,18 @@ def isToSkip(symbol):
 def checkOperation(coin, cross, newOperation):
 
    if (cross == CrossType.LONG):
-      if (coin['isBuyAllowed'] == True and coin['isSellAllowed'] == True):
-         return openLongOperation(newOperation, coin)
-      if (coin['isSellAllowed'] == False):
-         return closeOperation(newOperation, coin)
+      return openLongOperation(newOperation, coin)
+      # if (coin['isBuyAllowed'] == True and coin['isSellAllowed'] == True):
+      #    return openLongOperation(newOperation, coin)
+      # if (coin['isSellAllowed'] == False):
+      #    return closeOperation(newOperation, coin)
 
    if (cross == CrossType.SHORT):
-      if (coin['isBuyAllowed'] == True and coin['isSellAllowed'] == True):
-         return openShortOperation(newOperation, coin)
-      if (coin['isBuyAllowed'] == False):
-         return closeOperation(newOperation, coin)
+      return openShortOperation(newOperation, coin)
+      # if (coin['isBuyAllowed'] == True and coin['isSellAllowed'] == True):
+      #    return openShortOperation(newOperation, coin)
+      # if (coin['isBuyAllowed'] == False):
+      #    return closeOperation(newOperation, coin)
 
    return False
 

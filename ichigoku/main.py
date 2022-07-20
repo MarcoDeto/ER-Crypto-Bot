@@ -1,16 +1,18 @@
 from tkinter import N
+from services.tradingview import *
+from services.discord import *
 from services.utilities import *
 from services.binance import *
-from services.core import *
+from core import *
 from models.ichimoku import *
 
 symbols = ['BTCUSDT']
 
 def __main__():
-    global symbols    
-    initTelegram()
-    my_channel = getChannel()
-
+    global symbols
+    init_tradingview()
+    init_telegram()
+    my_channel = get_channel()
     timeDifference = getTimeDifference()
     print("Making initial API call")
     print("Getting Kline Data")

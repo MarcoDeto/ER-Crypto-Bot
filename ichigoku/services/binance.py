@@ -82,7 +82,7 @@ def getPrice(symbol):
     Cprz = client.futures_symbol_ticker(symbol=symbol)
     return Cprz['price']
 
-def open_order(symbol, side, quantity):
+def open_binance_order(symbol, quantity):
     return None
     # client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
     # data = client.futures_create_order(symbol=symbol,type="MARKET",side=side,quantity=1500,)

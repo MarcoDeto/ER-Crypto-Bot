@@ -34,22 +34,22 @@ def getIchimoku(dataArray, interval):
 def getIchimokuParams(interval):
     match (interval):
         case '1m':
-            return [60, 20, 160, 30]
+            return [20, 60, 160]
         case '3m':
-            return [60, 20, 160, 30]
+            return [20, 60, 160]
         case '5m':
-            return [60, 20, 160, 30]
+            return [20, 60, 160]
         case '15m':
-            return [26, 9, 52, 26]
+            return [9, 26, 52]
         case '30m':
-            return [26, 9, 52, 26]
+            return [9, 26, 52]
         case '1h':
-            return [26, 9, 52, 26]
+            return [9, 26, 52]
         case '2h':
-            return [26, 9, 52, 26]
+            return [9, 26, 52]
         case '4h':
-            return [26, 9, 52, 26]
+            return [9, 26, 52]
         case '1d':
-            return [26, 9, 52, 26]
+            return [9, 26, 52]
         case _:
             return None
