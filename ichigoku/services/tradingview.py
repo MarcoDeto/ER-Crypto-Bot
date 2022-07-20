@@ -40,6 +40,10 @@ def init_tradingview():
     input_password.send_keys(tradingViewPassword)
     input_password.submit()
     time.sleep(1)
+    driver.find_element(By.CLASS_NAME, 'managePreferences-W4Y0hWcd').click()
+    delay()
+    driver.find_element(By.CLASS_NAME, 'savePreferences-vDbnNLqD').click()
+    delay()
     
 
 def get_trading_view_graph(interval, currency, exchange):
@@ -48,10 +52,6 @@ def get_trading_view_graph(interval, currency, exchange):
     #init_tradingview(safariDriver)
     time.sleep(1)
     driver.get('https://www.tradingview.com/chart/?symbol=' + exchange + ':' + currency)
-    delay()
-    driver.find_element(By.CLASS_NAME, 'managePreferences-W4Y0hWcd').click()
-    delay()
-    driver.find_element(By.CLASS_NAME, 'savePreferences-vDbnNLqD').click()
     delay()
     driver.find_element(By.CLASS_NAME, 'menu-cXbh8Gcw').click()
     delay()
