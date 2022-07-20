@@ -1,79 +1,66 @@
-import time
 from tkinter import N
-from apiConnection import *
+from services.utilities import *
+from services.binance import *
+from services.core import *
 from models.ichimoku import *
 
-hour1,hour4,day1 = {},{},{}
-symbols = ['BTCUSDT', 'ETHUSDT']
+symbols = ['BTCUSDT']
 
 def __main__():
-    global hour1,hour4,day1, symbols
+    global symbols    
+    initTelegram()
+    my_channel = getChannel()
+
     timeDifference = getTimeDifference()
-    
-    print("Making initial API call with ichimoku params " + str(ICHIMOKU_PARAMS))
-    (hour1,hour4,day1) = initialize(symbols)
+    print("Making initial API call")
     print("Getting Kline Data")
-    onehourdata = getData('h', symbols)
-    fourhourdata = getData('q', symbols)
-    onedaydata = getData('d', symbols)
-    print("Distributing initial data to calculator nodes")
-    distribute_hourly_data(datadict=onehourdata)
-    distribute_fourhour_data(datadict=fourhourdata)
-    distribute_daily_data(datadict=onedaydata)
+    ichimokus = []
+    symbols_data = []
+    index = 0
+    for interval in INTERVALS:
+        data = getData(interval, symbols)
+        symbols_data.append(data)
+        dist_data = distribute_data(symbols_data[index], interval)
+        ichimokus.append(dist_data)
+        index = index + 1
     print("Entering Loop")
-    timeStamp = (getTime() - timeDifference)
-    detect1h = int(timeStamp // 3600)
-    detect4h = int(timeStamp // 14400)
-    detect1d = int(timeStamp // 86400)
+    detect = getDetect(timeDifference)
     while True:
-        #get new klines after 10 seconds the server time update, to be sure
+        index = 0
         delay = int(getTime() - 10000 - timeDifference)
-        difference1d = (delay // 86400)
-        difference4h = (delay // 14400)
-        difference1h = (delay // 3600)
+        for interval in INTERVALS:
+            difference = int(delay // getDelay(interval))
+            check_value = detect[index]
+            if(difference != check_value):
+                detect[index] = difference
+                symbols_data[index] = getData(interval, symbols)
+                ichimokus[index] = distribute_data(symbols_data[index], interval)
+                print("renew " + interval)
+                print(datetime.now())
+            
+            
+            current_Prices = getCurrentPrices(symbols)
+            price_index = 0
+            for price in current_Prices:
 
-        if(difference1d != detect1d):
-            detect1d = difference1d
-            onedaydata = getData('d', symbols)
-            distribute_daily_data(datadict=onedaydata)
-            print("renew daily")
+                checkStopLoss(price.symbol, price.price, my_channel)
 
-        elif(difference4h != detect4h):
-            detect4h = difference4h
-            distribute_fourhour_data(datadict=fourhourdata)
-            print("renew quarterly")
+                ichimokus_data = ichimokus[index][price_index]
+                kijun_sen = ichimokus_data[0].kijun_sen
+                checkTakeProfit(price.symbol, interval, price.price, kijun_sen, my_channel)
 
-        elif (difference1h != detect1h):
-            detect1h = difference1h
-            onehourdata = getData('h', symbols)
-            distribute_hourly_data(datadict=onehourdata)
-            print("renew hourly")
-
-        else:
-            current_Prices = getCurrentPrice(symbols)
-            distribute_ticker_price(current_Prices)
+                candles_data = symbols_data[index][price.symbol]
+                checkBreakOut(interval, candles_data, ichimokus_data, price, my_channel)
+                price_index = price_index + 1
+     
+            index = index + 1
 
 
-def distribute_hourly_data(datadict):
+def distribute_data(datadict, interval):
+    result = []
     for symbol in datadict:
-        ichimokuStatus = setInitialData(datadict[symbol])
-
-def distribute_fourhour_data(datadict):
-    for symbol in datadict:
-        ichimokuStatus = setInitialData(datadict[symbol])
-
-def distribute_daily_data(datadict):
-    for symbol in datadict:
-        ichimokuStatus = setInitialData(datadict[symbol])
-
-def distribute_ticker_price(current_Prices):
-    for data in current_Prices:
-        calculateChange(float(data.price), data.symbol, 'h')
-        calculateChange(float(data.price), data.symbol, 'q')
-        calculateChange(float(data.price), data.symbol, 'd')
-
-def getTime():
-    return int(round(time.time() * 1000))
-
+        ichimokuStatus = setInitialData(datadict[symbol], interval)
+        result.append(ichimokuStatus)
+    return result
 
 __main__()

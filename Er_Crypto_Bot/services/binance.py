@@ -47,12 +47,13 @@ def adjust_margintype(symbol):
     client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
     client.futures_change_margin_type(symbol=symbol, marginType='ISOLATED')
 
-def open_order(symbol, side, quantity):
+def open_order(cross, symbol):
     return None
-    # client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
-    # data = client.futures_create_order(symbol=symbol,type="MARKET",side=side,quantity=1500,)
-    # client.futures_create_order(symbol=symbol,type="LIMIT",timeInForce="GTC",side="SELL",price=sellPrice,quantity=quantity)
-    # return data
+    if (cross == 'LONG'):
+        data = client.futures_create_order(symbol=symbol, type="MARKET", side='BUY', quantity=1500)
+    elif (cross == 'SHORT'):
+        data = client.futures_create_order(symbol=symbol, type="MARKET", side='SELL', quantity=1500)
+    return data
 
 
 def getSymbols():
