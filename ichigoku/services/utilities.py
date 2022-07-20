@@ -62,22 +62,22 @@ def getDetect(timeDifference):
 def getDelay(interval):
     match (interval):
         case '1m':
-            return 600
+            return 2500
         case '3m':
-            return 1800
+            return 7500
         case '5m':
-            return 3000
+            return 10000
         case '15m':
-            return 9000
+            return 12500
         case '30m':
-            return 18000
+            return 15000
         case '1h':
-            return 36000
+            return 27500
         case '2h':
-            return 72000
+            return 25000
         case '4h':
-            return 144000
+            return 27500
         case '1d':
-            return 864000
+            return 30000
         case _:
             return 1

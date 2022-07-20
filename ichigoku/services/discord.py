@@ -1,7 +1,6 @@
 from discord import Webhook, RequestsWebhookAdapter
 
-webhook = Webhook.partial(999117023760093224, 'kM1MVQrWbn6g8E-UiU6LKT_kkgUuAXRCX0lSNZBN37hpkFerg3VqhH1gftXJILzCSQvm', adapter=RequestsWebhookAdapter())
-
+ichigoku_channel = Webhook.partial(999460525756907531, 'LbM1pBqC0NUlvHiePsWkbd6XnyOiu8YRyEwGygwc19AXYK398hpDBCvfd_jC1rPJMKQ4', adapter=RequestsWebhookAdapter())
 
 def sendDiscordMessage(message):
-    webhook.send(message, username='Er Crypto')
+    ichigoku_channel.send(message, username='Er Crypto')
