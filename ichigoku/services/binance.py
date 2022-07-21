@@ -27,10 +27,7 @@ def getSymbols():
 
 def getSymbol(symbol):
     coin_list = client.get_all_isolated_margin_symbols()
-    filtered = filter(
-        lambda coin: coin['quote'] == 'USDT' or coin['quote'] == 'BTC', coin_list)
-
-    filtered = filter(lambda coin: coin['symbol'] == symbol, coin_list)
+    filtered = list(filter(lambda coin: coin['symbol'] == symbol, coin_list))
     return filtered[0]
 
 
@@ -41,16 +38,23 @@ def getTimeDifference():
     return (server_time - binance_time)
 
 
-async def get_klines(symbol, interval, maxparam):
-    data = client.futures_klines(symbol=symbol, interval=interval, limit=maxparam)
-    return data
+async def get_klines(symbol, interval):
+    data = None
+    while data == None:
+        try:
+            data = client.futures_klines(symbol=symbol, interval=interval, limit=300)
+            return data
+        except:
+            print('get_klines Error')
 
 
-async def runKlines(interval, maxparam, symbols):
+
+
+async def runKlines(interval, symbols):
     tasks = []
     for symbol in symbols:
         currentSymbol = symbol
-        task = asyncio.ensure_future(get_klines(currentSymbol, interval, maxparam))
+        task = asyncio.ensure_future(get_klines(currentSymbol, interval))
         tasks.append(task)
 
     responses = await asyncio.gather(*tasks)
@@ -59,9 +63,8 @@ async def runKlines(interval, maxparam, symbols):
 
 def getData(interval, symbols):
     ichimoku_params = getIchimokuParams(interval)
-    maxparam = max(ichimoku_params)
     loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(runKlines(interval, maxparam, symbols))
+    future = asyncio.ensure_future(runKlines(interval, symbols))
     responses = loop.run_until_complete(future)
     returndict = {}
     for i in range(len(symbols)):
@@ -79,8 +82,15 @@ def getCurrentPrices(symbols):
     return result
 
 def getPrice(symbol):
-    Cprz = client.futures_symbol_ticker(symbol=symbol)
-    return Cprz['price']
+    price = None
+    while price == None:
+        try: 
+            Cprz = client.futures_symbol_ticker(symbol=symbol)
+            price = Cprz['price']
+            return price
+        except:
+            print('get_price Error')
+
 
 def open_binance_order(symbol, quantity):
     return None

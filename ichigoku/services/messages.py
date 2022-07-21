@@ -6,13 +6,16 @@ def send_open_messages(my_channel, symbol, cross, open_price, link, time_frame):
 
     order = '**ORDER OPEN**\n\n'
     symbolCross = '**' + symbol + ' - BUY 🟢'
-    openPrice = '\n**OPEN PRICE**: ' + str(open_price) + ' 🛒'
+    openPrice = '\nOPEN PRICE**: ' + str(open_price) + ' 🛒'
     interval = '\n**TIME FRAME**: ' + str(time_frame)
 
     if (cross == 'SHORT'):
         symbolCross = '**' + symbol + ' - SELL 🔴'
 
-    graph_link = '\n' + link + '\n'
+    if (link != None):
+        graph_link = '\n' + link + '\n'
+    else:
+        graph_link = ''
 
     message = order + symbolCross + openPrice + interval + graph_link
     sendTelegramMessage(my_channel, message)
@@ -39,7 +42,10 @@ def getMessage(symbol, cross, open_date, open_price, link, close_price, percent,
     if (stop_loss == True):
         order = '**STOP LOSS** ❌\n\n'
 
-    graph_link = '\n' + link + '\n'
+    if (link != None):
+        graph_link = '\n' + link + '\n'
+    else:
+        graph_link = ''
 
     return order + symbolCross + openDate + openPrice + closePrice + profit + duration + interval + graph_link
 

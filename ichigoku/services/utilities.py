@@ -2,7 +2,6 @@
 import time
 import numpy as np
 from config import *
-from services.mongoDB import getIchimokuDB
 from models.ichimoku import getIchimoku
 
 
@@ -23,7 +22,8 @@ def get_close_prices(datalist):
 def setInitialData(data, interval):
     dataArray = get_neccesaries(data)
     currentIchimoku = getIchimoku(dataArray, interval)
-    lastIchimoku = getIchimoku(dataArray[:len(dataArray) - 2], interval)
+    lastcandels = dataArray[:len(dataArray) - 1]
+    lastIchimoku = getIchimoku(lastcandels, interval)
     return (currentIchimoku, lastIchimoku)
 
 
@@ -38,13 +38,6 @@ def diffPercent(Xi, Xf, cross):
 
 def diffTime(open, close):
     return close - open
-
-
-def getOperationDB(coin, interval):
-    operationDB = getIchimokuDB(coin, interval)
-    if (operationDB):
-        return operationDB
-    return coin
 
 
 def getTime():
@@ -81,3 +74,31 @@ def getDelay(interval):
             return 30000
         case _:
             return 1
+
+
+def clickInterval(interval, intervals):
+    match (interval):
+        case '1m':
+            intervals[5].click()
+        case '3m':
+            intervals[6].click()
+        case '5m':
+            intervals[7].click()
+        case '15m':
+            intervals[8].click()
+        case '30m':
+            intervals[9].click()
+        case '45m':
+            intervals[10].click()
+        case '1h':
+            intervals[11].click()
+        case '2h':
+            intervals[12].click()
+        case '3h':
+            intervals[13].click()
+        case '4h':
+            intervals[14].click()
+        case '1d':
+            intervals[15].click()
+        case _:
+            return

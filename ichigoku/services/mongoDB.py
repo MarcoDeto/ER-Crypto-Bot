@@ -11,7 +11,7 @@ from services.telegram import *
 from config import CONNECTION_STRING
 from models.operation import Operation
 from services.binance import *
-from services.utilities import *
+from services.utilities import diffPercent, diffTime
 
 client = MongoClient(CONNECTION_STRING)
 mongoDB = client['Er_Crypto_Bot']
@@ -27,12 +27,16 @@ def getIchimokus():
 
 
 def getIchimokuDB(coin, interval):
-
+   count = collection.count_documents({})
+   if (count == 0): return None
    query = {
       'symbol': coin['symbol'],
       'time_frame': interval,
       'close_price': { '$eq': None }
    }
+   count = collection.count_documents(query)
+   if (count == 0):
+      return coin
    item_details = collection.find(query).sort('open_date', pymongo.DESCENDING)
    result = {}
    i = 0
@@ -41,7 +45,14 @@ def getIchimokuDB(coin, interval):
       i = i+1
    if (len(result) > 0):
       return result[0]
-   return result
+   return coin
+
+
+def getOperationDB(coin, interval):
+   operationDB = getIchimokuDB(coin, interval)
+   if (operationDB):
+       return operationDB
+   return coin
 
 
 def getOperationNumber(coin, interval):
@@ -54,17 +65,22 @@ def getOperationNumber(coin, interval):
    return result + 1
 
 
-def checkIfOpen(coin, interval):
+def checkIfOpen(coin, cross, interval):
    query = {
       'symbol': coin['symbol'],
       'time_frame': interval,
       'close_price': { '$ne': None },
       "status": 'OPEN', 
-      "cross": coin['cross'],
+      "cross": cross,
    }
-   count = collection.find(query).sort('open_date', pymongo.ASCENDING)
-   if (len(count) > 0):
-      return count[0]
+   count = collection.count_documents(query)
+   if (count == 0): return None
+   item_details = collection.find(query).sort('open_date', pymongo.ASCENDING)
+   result = []
+   for item in item_details:
+      result.append(item)
+   if (len(result) > 0):
+      return item_details[0]
    return None
 
 

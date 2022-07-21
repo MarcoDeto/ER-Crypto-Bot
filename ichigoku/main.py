@@ -9,6 +9,7 @@ from models.ichimoku import *
 symbols = ['BTCUSDT']
 
 def __main__():
+    
     global symbols
     init_tradingview()
     init_telegram()

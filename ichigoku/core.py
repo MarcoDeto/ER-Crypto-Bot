@@ -12,10 +12,12 @@ def checkBreakOut(interval, symbols_data, ichimokus_data, price, my_channel):
     senkou_span_B = current.senkou_span_B
     # close_price = current.close_price
     current_price = float(price.price)
+    coin = getSymbol(price.symbol)
 
     #strategia doppio massimo o doppio minimo sul trand e -26 candele su rsi
     #close_prices = get_close_prices(symbols_data)
     #double_max_rsi(close_prices)
+
 
     if (current_price > senkou_span_B and last_price < last_senkou_span_B):
 
@@ -23,7 +25,6 @@ def checkBreakOut(interval, symbols_data, ichimokus_data, price, my_channel):
 
         close_prices = get_close_prices(symbols_data)
         if (RSIIsAlert(close_prices) == RSIType.OVERBOUGHT):
-            coin = getSymbol(price.symbol)
             openLong(coin, interval, my_channel)
 
     if (current_price < senkou_span_B and last_price > last_senkou_span_B):
@@ -32,7 +33,6 @@ def checkBreakOut(interval, symbols_data, ichimokus_data, price, my_channel):
 
         close_prices = get_close_prices(symbols_data)
         if (RSIIsAlert(close_prices) == RSIType.OVERSOLD):
-            coin = getSymbol(price.symbol)
             openShort(coin, interval, my_channel)
 
 
@@ -67,14 +67,12 @@ def openShort(coin, interval, my_channel):
 
 
 def if_long_open(coin, interval, my_channel):
-    newOperation = createOperation(coin, CrossType.LONG, interval)
-    open_operation = checkIfOpen(coin, newOperation)
+    open_operation = checkIfOpen(coin ,'LONG', interval)
     if (open_operation != None):
         insertIchiGoku(coin, my_channel)
 
 
 def if_short_open(coin, interval, my_channel):
-    newOperation = createOperation(coin, CrossType.SHORT, interval)
-    open_operation = checkIfOpen(coin, newOperation)
+    open_operation = checkIfOpen(coin, 'SHORT', interval)
     if (open_operation != None):
         insertIchiGoku(coin, my_channel)
