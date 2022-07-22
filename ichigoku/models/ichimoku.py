@@ -34,9 +34,11 @@ def getIchimoku(dataArray, interval):
     kijun_sen = (medium_max + medium_min)/2
     
     senkou_span_A = (tenkan_sen + kijun_sen)/2
-
-    long_max = dataArray[:,0][-(ICHIMOKU_PARAMS[2]+ICHIMOKU_PARAMS[1]):-ICHIMOKU_PARAMS[1]].max()
-    lonh_min = dataArray[:,1][-(ICHIMOKU_PARAMS[2]+ICHIMOKU_PARAMS[1]):-ICHIMOKU_PARAMS[1]].min()
+    # torna indietro di n candele
+    start_index = -( ICHIMOKU_PARAMS[2] + ICHIMOKU_PARAMS[1] - 1 )
+    end_index = -( ICHIMOKU_PARAMS[1] - 1 )
+    long_max = dataArray[:,0][start_index:end_index].max()
+    lonh_min = dataArray[:,1][start_index:end_index].min()
     # lonh_max = dataArray[:,0][-ICHIMOKU_PARAMS[2]:].max()
     # lonh_min = dataArray[:,1][-ICHIMOKU_PARAMS[2]:].min()
     senkou_span_B = (long_max + lonh_min)/2

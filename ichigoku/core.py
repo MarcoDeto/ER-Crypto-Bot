@@ -4,22 +4,21 @@ from models.enums import *
 from services.utilities import *
 
 
-def checkBreakOut(interval, symbols_data, ichimokus_data, price, my_channel):
+def checkBreakOut(coin, interval, symbols_data, ichimokus_data, price, my_channel):
     current = ichimokus_data[0]
     last = ichimokus_data[1]
     last_senkou_span_B = last.senkou_span_B
     last_price = last.close_price
     senkou_span_B = current.senkou_span_B
-    # close_price = current.close_price
-    current_price = float(price.price)
-    coin = getSymbol(price.symbol)
+    close_price = current.close_price
+    # current_price = float(price.price)
 
     #strategia doppio massimo o doppio minimo sul trand e -26 candele su rsi
     #close_prices = get_close_prices(symbols_data)
     #double_max_rsi(close_prices)
 
 
-    if (current_price > senkou_span_B and last_price < last_senkou_span_B):
+    if (close_price > senkou_span_B and last_price < last_senkou_span_B):
 
         if_long_open(coin, interval, my_channel)
 
@@ -27,7 +26,7 @@ def checkBreakOut(interval, symbols_data, ichimokus_data, price, my_channel):
         if (RSIIsAlert(close_prices) == RSIType.OVERBOUGHT):
             openLong(coin, interval, my_channel)
 
-    if (current_price < senkou_span_B and last_price > last_senkou_span_B):
+    if (close_price < senkou_span_B and last_price > last_senkou_span_B):
 
         if_short_open(coin, interval, my_channel)
 

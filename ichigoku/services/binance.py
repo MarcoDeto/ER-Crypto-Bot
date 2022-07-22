@@ -48,8 +48,6 @@ async def get_klines(symbol, interval):
             print('get_klines Error')
 
 
-
-
 async def runKlines(interval, symbols):
     tasks = []
     for symbol in symbols:

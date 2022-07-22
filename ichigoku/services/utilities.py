@@ -20,11 +20,16 @@ def get_close_prices(datalist):
 
 
 def setInitialData(data, interval):
-    dataArray = get_neccesaries(data)
-    currentIchimoku = getIchimoku(dataArray, interval)
-    lastcandels = dataArray[:len(dataArray) - 1]
-    lastIchimoku = getIchimoku(lastcandels, interval)
-    return (currentIchimoku, lastIchimoku)
+
+    data_array = get_neccesaries(data)
+
+    current_candels = data_array[:len(data_array) - 1]
+    current_ichimoku = getIchimoku(current_candels, interval)
+
+    last_candels = data_array[:len(data_array) - 2]
+    last_ichimoku = getIchimoku(last_candels, interval)
+
+    return (current_ichimoku, last_ichimoku)
 
 
 def diffPercent(Xi, Xf, cross):

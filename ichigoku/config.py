@@ -12,7 +12,7 @@ TELEGRAM_API_HASH = '15b0d68a8f31361f902ddd4f11c30d1f'
 TELEGRAM_PHONE = '+39 3342927723'
 TELEGRAM_USERBNAME = 'blingus'
 TELEGRAM_CHANNEL = 'https://t.me/ercryptobotto'
-ICHIMOKU_PARAMS = [26, 9, 52, 26]
+ICHIMOKU_PARAMS = [9, 26, 52, 26]
 # Binance Date Format: '1 July, 2022'
 #incrocio short: 10 con 123 su daily 
 #incrocio long: 10 con 60 su daily 

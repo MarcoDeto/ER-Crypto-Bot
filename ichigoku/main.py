@@ -11,7 +11,7 @@ symbols = ['BTCUSDT']
 def __main__():
     
     global symbols
-    init_tradingview()
+    #init_tradingview()
     init_telegram()
     my_channel = get_channel()
     timeDifference = getTimeDifference()
@@ -28,6 +28,7 @@ def __main__():
         index = index + 1
     print("Entering Loop")
     detect = getDetect(timeDifference)
+    coin = getSymbol(symbols[0])
     while True:
         index = 0
         delay = int(getTime() - 10000 - timeDifference)
@@ -53,7 +54,7 @@ def __main__():
                 checkTakeProfit(price.symbol, interval, price.price, kijun_sen, my_channel)
 
                 candles_data = symbols_data[index][price.symbol]
-                checkBreakOut(interval, candles_data, ichimokus_data, price, my_channel)
+                checkBreakOut(coin, interval, candles_data, ichimokus_data, price, my_channel)
                 price_index = price_index + 1
      
             index = index + 1
