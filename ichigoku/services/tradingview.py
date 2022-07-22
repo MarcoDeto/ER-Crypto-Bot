@@ -69,7 +69,7 @@ def get_trading_view_graph(interval, currency, exchange):
         delay()
         driver.find_elements(By.CLASS_NAME, 'tab-Zcmov9JL')[0].click()
         delay()
-        driver.find_element(By.CLASS_NAME, 'input-CcsqUMct').send_keys('ichimoku ' + interval)
+        driver.find_element(By.CLASS_NAME, 'input-CcsqUMct').send_keys('ichimoku')
         delay()
         driver.find_elements(By.CLASS_NAME, 'main-FkkXGK5n')[0].click()
         delay()
@@ -77,7 +77,7 @@ def get_trading_view_graph(interval, currency, exchange):
         delay
         driver.find_element(By.CLASS_NAME, 'input-CcsqUMct').send_keys('rsi 20-80 ')
         delay()
-        driver.find_elements(By.CLASS_NAME, 'main-FkkXGK5n')[1].click()
+        driver.find_elements(By.CLASS_NAME, 'main-FkkXGK5n')[0].click()
         driver.find_element(By.CLASS_NAME, 'close-tuOy5zvD').click()
         delay()
         driver.find_element(By.ID, 'header-toolbar-screenshot').click()
@@ -88,6 +88,7 @@ def get_trading_view_graph(interval, currency, exchange):
         time.sleep(5)
         url = root.clipboard_get()
         driver.get('https://www.tradingview.com/')
+        time.sleep(5)
         return url
     except:
         return None

@@ -1,6 +1,6 @@
 from datetime import datetime
 import numpy as np
-from ichigoku.config import ICHIMOKU_PARAMS
+from config import ICHIMOKU_PARAMS
 
 from services.rsi import *
 
