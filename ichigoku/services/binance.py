@@ -62,7 +62,6 @@ async def runKlines(interval, symbols):
     
 
 def getData(interval, symbols):
-    ichimoku_params = getIchimokuParams(interval)
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(runKlines(interval, symbols))
     responses = loop.run_until_complete(future)

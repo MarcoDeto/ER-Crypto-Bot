@@ -1,5 +1,6 @@
 from datetime import datetime
 import numpy as np
+from ichigoku.config import ICHIMOKU_PARAMS
 
 from services.rsi import *
 
@@ -21,7 +22,8 @@ class Ichimoku:
 
 
 def getIchimoku(dataArray, interval):
-    ICHIMOKU_PARAMS = getIchimokuParams(interval)
+
+    # ICHIMOKU_PARAMS = getIchimokuParams(interval)
 
     short_max = dataArray[:,0][-ICHIMOKU_PARAMS[0]:].max()
     short_min = dataArray[:,1][-ICHIMOKU_PARAMS[0]:].min()

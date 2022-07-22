@@ -9,8 +9,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from services.utilities import clickInterval
 
-
-
 try:
     driver = Safari()
     driver.maximize_window()
@@ -47,7 +45,7 @@ def init_tradingview():
     input_password = driver.find_element(By.NAME, 'password')
     input_password.send_keys(tradingViewPassword)
     input_password.submit()
-    time.sleep(5)
+    time.sleep(20)
     driver.find_element(By.CLASS_NAME, 'managePreferences-W4Y0hWcd').click()
     delay()
     driver.find_element(By.CLASS_NAME, 'savePreferences-vDbnNLqD').click()
@@ -57,8 +55,9 @@ def init_tradingview():
 def get_trading_view_graph(interval, currency, exchange):
 
     try: 
-    #init_tradingview(safariDriver)
         time.sleep(1)
+        driver.get('https://www.tradingview.com/')
+        time.sleep(3)
         driver.get('https://www.tradingview.com/chart/?symbol=' + exchange + ':' + currency)
         time.sleep(3)
         driver.find_element(By.CLASS_NAME, 'menu-cXbh8Gcw').click()
