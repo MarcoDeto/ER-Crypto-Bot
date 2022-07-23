@@ -1,35 +1,38 @@
 from webdriver_manager.chrome import ChromeDriverManager # pip install webdriver-manager
 from selenium.webdriver import Safari, Edge, Chrome # pip install selenium
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 import tkinter as tk
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from services.utilities import clickInterval
+from services.utilities import get_interval_index
 
 try:
     driver = Safari()
-    driver.maximize_window()
 except:
-    # try:
-    #     opera_driver_manager = OperaDriverManager().install()
-    #     driver = Opera(service=Service(opera_driver_manager))
-    # except:
+    try:
+        driver = Edge()
+    except:
         try:
             chrome_driver_manager = ChromeDriverManager().install()
             driver = Chrome(service=Service(chrome_driver_manager))
         except:
-            driver = Edge()
-            driver.maximize_window()
-
+            pass
+            # opera_driver_manager = OperaDriverManager().install()
+            # driver = Opera(service=Service(opera_driver_manager))
+        
 
 def init_tradingview():
-    
+    return
+    driver.maximize_window()
     driver.get('https://www.tradingview.com/#signin')
     tradingViewuserName = 'MARCO_DE_TOMASI'
     tradingViewPassword = 'Detomasi00'
+    # tradingViewuserName = 'tradingviewinvasion@gmail.com'
+    # tradingViewPassword = 'Canazza88'
     delay()
     button_email = driver.find_element(By.CLASS_NAME, 'js-show-email')
     button_email.click()
@@ -45,7 +48,8 @@ def init_tradingview():
     input_password = driver.find_element(By.NAME, 'password')
     input_password.send_keys(tradingViewPassword)
     input_password.submit()
-    time.sleep(20)
+    #time.sleep(20)
+    time.sleep(5)
     driver.find_element(By.CLASS_NAME, 'managePreferences-W4Y0hWcd').click()
     delay()
     driver.find_element(By.CLASS_NAME, 'savePreferences-vDbnNLqD').click()
@@ -53,7 +57,7 @@ def init_tradingview():
     
 
 def get_trading_view_graph(interval, currency, exchange):
-
+    return None
     try: 
         time.sleep(1)
         driver.get('https://www.tradingview.com/')
@@ -62,8 +66,9 @@ def get_trading_view_graph(interval, currency, exchange):
         time.sleep(3)
         driver.find_element(By.CLASS_NAME, 'menu-cXbh8Gcw').click()
         delay()
-        intervals = driver.find_elements(By.CLASS_NAME, 'item-4TFSfyGO')
-        clickInterval(interval, intervals)
+        index: int = get_interval_index(interval)
+        driver.find_elements(By.CLASS_NAME, 'item-4TFSfyGO')[index].click()
+        delay()
         buttons = driver.find_elements(By.CLASS_NAME, 'button-Rsu8YfBx')
         buttons[1].click()
         delay()
@@ -88,6 +93,9 @@ def get_trading_view_graph(interval, currency, exchange):
         time.sleep(5)
         url = root.clipboard_get()
         driver.get('https://www.tradingview.com/')
+        WebDriverWait(driver, 20).until(EC.alert_is_present())
+        alert = driver.switch_to.alert
+        alert.accept()
         time.sleep(5)
         return url
     except:

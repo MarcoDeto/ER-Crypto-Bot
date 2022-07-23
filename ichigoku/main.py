@@ -1,10 +1,8 @@
-from tkinter import N
-from services.tradingview import *
-from services.discord import *
-from services.utilities import *
-from services.binance import *
+from services.manager import *
+from services.database.mongoDB import *
+from services.messages.tradingview import *
+from services.messages.telegram import *
 from core import *
-from models.ichimoku import *
 
 symbols = ['BTCUSDT']
 
@@ -12,6 +10,7 @@ def __main__():
     
     global symbols
     #init_tradingview()
+    #get_trading_view_graph('1m', 'BTCUSDT', 'BINANCE')
     init_telegram()
     my_channel = get_channel()
     timeDifference = getTimeDifference()
@@ -19,52 +18,55 @@ def __main__():
     print("Getting Kline Data")
     ichimokus = []
     symbols_data = []
-    index = 0
+    interval_i = 0
     for interval in INTERVALS:
         data = getData(interval, symbols)
         symbols_data.append(data)
-        dist_data = distribute_data(symbols_data[index], interval)
+        dist_data = distribute_data(symbols_data[interval_i], interval)
         ichimokus.append(dist_data)
-        index = index + 1
+        interval_i = interval_i + 1
     print("Entering Loop")
     detect = getDetect(timeDifference)
     coin = getSymbol(symbols[0])
     while True:
-        index = 0
+        interval_i = 0
         delay = int(getTime() - 10000 - timeDifference)
         for interval in INTERVALS:
-            difference = int(delay // getDelay(interval))
-            check_value = detect[index]
+            difference = int(delay // get_delay(interval))
+            check_value = detect[interval_i]
             if(difference != check_value):
-                detect[index] = difference
-                symbols_data[index] = getData(interval, symbols)
-                ichimokus[index] = distribute_data(symbols_data[index], interval)
+                detect[interval_i] = difference
+                symbols_data[interval_i] = getData(interval, symbols)
+                ichimokus[interval_i] = distribute_data(symbols_data[interval_i], interval)
                 print("renew " + interval)
                 print(datetime.now())
             
             
             current_Prices = getCurrentPrices(symbols)
-            price_index = 0
+            price_i = 0
             for price in current_Prices:
 
-                checkStopLoss(price.symbol, price.price, my_channel)
+                check_stop_loss(my_channel, price.symbol, price.price)
 
-                ichimokus_data = ichimokus[index][price_index]
+                ichimokus_data = ichimokus[interval_i][price_i]
                 kijun_sen = ichimokus_data[0].kijun_sen
-                checkTakeProfit(price.symbol, interval, price.price, kijun_sen, my_channel)
 
-                candles_data = symbols_data[index][price.symbol]
-                checkBreakOut(coin, interval, candles_data, ichimokus_data, price, my_channel)
-                price_index = price_index + 1
+                check_trading_stops(my_channel, price.symbol, interval, price.price, kijun_sen)
+
+                candles_data = symbols_data[interval_i][price.symbol]
+                close_prices = get_close_prices(candles_data)
+
+                check_take_profit(my_channel, price.symbol, interval, price.price, close_prices)
+
+                larger_interval_trend = None
+                if (interval_i != len(INTERVALS)-1):
+                    larger_index = interval_i+1
+                    larger_interval_trend = ichimokus[larger_index][price_i][2]
+                
+                checkBreakOut(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel)
+                price_i = price_i + 1
      
-            index = index + 1
+            interval_i = interval_i + 1
 
-
-def distribute_data(datadict, interval):
-    result = []
-    for symbol in datadict:
-        ichimokuStatus = setInitialData(datadict[symbol], interval)
-        result.append(ichimokuStatus)
-    return result
 
 __main__()

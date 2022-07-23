@@ -1,5 +1,5 @@
 from bson import ObjectId
-from services.mongoDB import getOperationNumber
+from services.database.mongoDB import getOperationNumber
 from models.enums import *
 from models.operation import Operation
 

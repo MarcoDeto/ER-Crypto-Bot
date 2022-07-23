@@ -1,9 +1,9 @@
 import time
 import numpy as np
-from services.binance import getPrice
+from services.exchange.binance import getPrice
 from models.enums import CrossType, Status
 from services.coins import checkOperation, createOperation, updateOperation
-from services.mongoDB import getEMA, insertEMA, checkStopLoss, updateEMA
+from services.database.mongoDB import getEMA, insertEMA, checkStopLoss, updateEMA
 from config import MAIN_EMAS, SECOND_EMAS 
 import talib #pip3 install ta-lib
 

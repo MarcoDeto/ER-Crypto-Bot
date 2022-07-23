@@ -10,3 +10,7 @@ class CrossType(Enum):
 class RSIType(Enum):
    OVERBOUGHT = 1
    OVERSOLD = 2
+
+class Trend(Enum):
+   UPTREND = 1
+   DOWNTREND = 2

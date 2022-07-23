@@ -1,5 +1,5 @@
 from bson import ObjectId
-from services.mongoDB import getOperationNumber
+from services.database.mongoDB import getOperationNumber
 from models.enums import *
 from models.operation import Operation
 
@@ -21,17 +21,9 @@ def checkOperation(coin, cross, newOperation):
 
    if (cross == CrossType.LONG):
       return openLongOperation(newOperation, coin)
-      # if (coin['isBuyAllowed'] == True and coin['isSellAllowed'] == True):
-      #    return openLongOperation(newOperation, coin)
-      # if (coin['isSellAllowed'] == False):
-      #    return closeOperation(newOperation, coin)
 
    if (cross == CrossType.SHORT):
       return openShortOperation(newOperation, coin)
-      # if (coin['isBuyAllowed'] == True and coin['isSellAllowed'] == True):
-      #    return openShortOperation(newOperation, coin)
-      # if (coin['isBuyAllowed'] == False):
-      #    return closeOperation(newOperation, coin)
 
    return False
 

@@ -4,10 +4,10 @@ from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
 
 import pymongo
-from services.telegram import sendMessage
+from services.messages.telegram import sendMessage
 from config import CONNECTION_STRING
 from models.operation import Operation
-from services.binance import *
+from services.exchange.binance import *
 
 
 def getConnection():

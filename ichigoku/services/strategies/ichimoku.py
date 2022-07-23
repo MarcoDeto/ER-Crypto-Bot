@@ -1,8 +1,7 @@
-from datetime import datetime
 import numpy as np
 from config import ICHIMOKU_PARAMS
 
-from services.rsi import *
+from services.strategies.rsi import *
 
 dataArray = np.array([0])
 ichimokuStatus = False
@@ -39,13 +38,12 @@ def getIchimoku(dataArray, interval):
     end_index = -( ICHIMOKU_PARAMS[1] - 1 )
     long_max = dataArray[:,0][start_index:end_index].max()
     lonh_min = dataArray[:,1][start_index:end_index].min()
-    # lonh_max = dataArray[:,0][-ICHIMOKU_PARAMS[2]:].max()
-    # lonh_min = dataArray[:,1][-ICHIMOKU_PARAMS[2]:].min()
     senkou_span_B = (long_max + lonh_min)/2
 
     current_high = dataArray[:,0][-1]
     current_low = dataArray[:,1][-1]
     close_price = dataArray[:,2][-1]
+
     return Ichimoku(interval, tenkan_sen, kijun_sen, senkou_span_A, senkou_span_B, current_high, current_low, close_price)
 
 

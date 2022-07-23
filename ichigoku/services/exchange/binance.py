@@ -2,7 +2,7 @@ import time
 import asyncio
 from binance.client import Client
 from config import *
-from models.ichimoku import *
+from services.strategies.ichimoku import *
 
 client = Client(BINANCE_API_KEY, BINANCE_API_SECRET, testnet=False)
 
@@ -95,6 +95,9 @@ def open_binance_order(symbol, quantity):
     # data = client.futures_create_order(symbol=symbol,type="MARKET",side=side,quantity=1500,)
     # client.futures_create_order(symbol=symbol,type="LIMIT",timeInForce="GTC",side="SELL",price=sellPrice,quantity=quantity)
     # return data
+
+def close_binance_order(symbol, quantity):
+    return None
 
 class Symbol:
     def __init__(self, symbol, price):

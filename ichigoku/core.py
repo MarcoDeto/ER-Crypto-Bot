@@ -1,77 +1,84 @@
+from services.manager import *
 from services.coins import *
-from services.mongoDB import *
+from services.database.mongoDB import *
 from models.enums import *
 from services.utilities import *
 
 
-def checkBreakOut(coin, interval, symbols_data, ichimokus_data, price, my_channel):
+def checkBreakOut(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel):
     current = ichimokus_data[0]
     last = ichimokus_data[1]
     last_senkou_span_B = last.senkou_span_B
     last_price = last.close_price
     senkou_span_B = current.senkou_span_B
     close_price = current.close_price
-    # current_price = float(price.price)
 
-    #strategia doppio massimo o doppio minimo sul trand e -26 candele su rsi
-    #close_prices = get_close_prices(symbols_data)
-    #double_max_rsi(close_prices)
-
-
+    #LONG
     if (close_price > senkou_span_B and last_price < last_senkou_span_B):
 
-        if_long_open(coin, interval, my_channel)
+        if larger_interval_trend == Trend.DOWNTREND:
+            return
 
-        close_prices = get_close_prices(symbols_data)
-        if (RSIIsAlert(close_prices) == RSIType.OVERBOUGHT):
+        is_added = is_just_added(coin, 'LONG', interval)
+        if is_added == True: return 
+
+        elif is_added == False: 
             openLong(coin, interval, my_channel)
+        
+        elif is_added == None:
+            if (RSIIsAlert(close_prices) == RSIType.OVERBOUGHT):
+                openLong(coin, interval, my_channel)
 
+    #SHORT
     if (close_price < senkou_span_B and last_price > last_senkou_span_B):
 
-        if_short_open(coin, interval, my_channel)
+        if (larger_interval_trend == Trend.UPTREND):
+            return
 
-        close_prices = get_close_prices(symbols_data)
-        if (RSIIsAlert(close_prices) == RSIType.OVERSOLD):
+        is_added = is_just_added(coin, 'SHORT', interval)
+        if is_added == True: return 
+
+        elif is_added == False: 
             openShort(coin, interval, my_channel)
+
+        elif is_added == None:
+            if (RSIIsAlert(close_prices) == RSIType.OVERSOLD):
+                openShort(coin, interval, my_channel)
 
 
 def openLong(coin, interval, my_channel):
     print('LONG'+' '+interval)
     newOperation = createOperation(coin, CrossType.LONG, interval)
-    # coin = getOperationDB(coin, interval)
+    coin = getOperationDB(coin, CrossType.LONG, interval)
     span_B_cross = checkOperation(coin, CrossType.LONG, newOperation)
     if (span_B_cross == False):
         return
 
-    # if (span_B_cross.operation_type == Status.CLOSE):
-    #     updateIchiGoku(span_B_cross, coin, my_channel)
-    #     span_B_cross = updateOperation(newOperation, coin, interval)
-
-    insertIchiGoku(span_B_cross, my_channel)
+    open_operation(my_channel, span_B_cross)
 
 
 def openShort(coin, interval, my_channel):
     print('SHORT'+' '+interval)
     newOperation = createOperation(coin, CrossType.SHORT, interval)
-    # coin = getOperationDB(coin, interval)
+    coin = getOperationDB(coin, CrossType.SHORT, interval)
     span_B_cross = checkOperation(coin, CrossType.SHORT, newOperation)
     if (span_B_cross == False):
         return
 
-    #if (span_B_cross.operation_type == Status.CLOSE):
-    #    updateIchiGoku(span_B_cross, coin, my_channel)
-    #    span_B_cross = updateOperation(newOperation, coin, interval)
-
-    insertIchiGoku(span_B_cross, my_channel)
+    open_operation(my_channel, span_B_cross)
 
 
-def if_long_open(coin, interval, my_channel):
-    open_operation = checkIfOpen(coin ,'LONG', interval)
-    if (open_operation != None):
-        insertIchiGoku(coin, my_channel)
+def is_just_added(coin, cross, interval):
+    open_operation = checkIfOpen(coin, cross, interval)
+
+    if (open_operation == None): return None
+
+    open_timestap = datetime.timestamp(open_operation['open_date'])
+    now = datetime.now()
+    now_timestap = datetime.timestamp(now)
+    diff = now_timestap - open_timestap
+    if (diff < get_timestap(interval)):
+        return True
+    return False
 
 
-def if_short_open(coin, interval, my_channel):
-    open_operation = checkIfOpen(coin, 'SHORT', interval)
-    if (open_operation != None):
-        insertIchiGoku(coin, my_channel)

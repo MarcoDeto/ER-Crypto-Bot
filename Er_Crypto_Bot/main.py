@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
-from services.telegram import *
-from services.binance import get_klines, getSymbols
+from services.messages.telegram import *
+from services.exchange.binance import get_klines, getSymbols
 from services.coins import isToSkip
 from services.emas import checkEMAs
 

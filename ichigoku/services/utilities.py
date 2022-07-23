@@ -2,7 +2,9 @@
 import time
 import numpy as np
 from config import *
-from models.ichimoku import getIchimoku
+from datetime import datetime
+from services.strategies.trend import get_interval_trend
+from services.strategies.ichimoku import getIchimoku
 
 
 def get_neccesaries(datalist):
@@ -23,14 +25,24 @@ def setInitialData(data, interval):
 
     data_array = get_neccesaries(data)
 
+    trend = get_interval_trend(data)
+
     current_candels = data_array[:len(data_array) - 1]
     current_ichimoku = getIchimoku(current_candels, interval)
 
     last_candels = data_array[:len(data_array) - 2]
     last_ichimoku = getIchimoku(last_candels, interval)
 
-    return (current_ichimoku, last_ichimoku)
+    return (current_ichimoku, last_ichimoku, trend)
 
+
+def distribute_data(datadict, interval):
+    result = []
+    for symbol in datadict:
+        ichimokuStatus = setInitialData(datadict[symbol], interval)
+        result.append(ichimokuStatus)
+    return result
+    
 
 def diffPercent(Xi, Xf, cross):
     if (cross == 'LONG'):
@@ -53,11 +65,17 @@ def getDetect(timeDifference):
     timeStamp = (getTime() - timeDifference)
     result = []
     for interval in INTERVALS:
-        result.append(int(timeStamp // getDelay(interval)))
+        result.append(int(timeStamp // get_delay(interval)))
     return result
 
+def get_operation_info(operation, price):
+   close_date = datetime.now()
+   time = diffTime(operation['open_date'], close_date)
+   diff = diffPercent(operation['open_price'], float(price), operation['cross'])
+   percent = round(diff, 2)
+   return (close_date, time, percent)
 
-def getDelay(interval):
+def get_delay(interval):
     match (interval):
         case '1m':
             return 2500
@@ -81,29 +99,53 @@ def getDelay(interval):
             return 1
 
 
-def clickInterval(interval, intervals):
+def get_interval_index(interval):
     match (interval):
         case '1m':
-            intervals[5].click()
+            return 5
         case '3m':
-            intervals[6].click()
+            return 6
         case '5m':
-            intervals[7].click()
+            return 7
         case '15m':
-            intervals[8].click()
+            return 8
         case '30m':
-            intervals[9].click()
+            return 9
         case '45m':
-            intervals[10].click()
+            return 10
         case '1h':
-            intervals[11].click()
+            return 11
         case '2h':
-            intervals[12].click()
+            return 12
         case '3h':
-            intervals[13].click()
+            return 13
         case '4h':
-            intervals[14].click()
+            return 14
         case '1d':
-            intervals[15].click()
+            return 15
         case _:
             return
+
+
+def get_timestap(interval):
+    match (interval):
+        case '1m':
+            return 60 * 1000
+        case '3m':
+            return 60 * 3 * 1000
+        case '5m':
+            return 60 * 5 * 1000
+        case '15m':
+            return 60 * 15 * 1000
+        case '30m':
+            return 60 * 30 * 1000
+        case '1h':
+            return 60 * 60 * 1000
+        case '2h':
+            return 60 * 60 * 2 * 1000
+        case '4h':
+            return 60 * 60 * 4 * 1000
+        case '1d':
+            return 60 * 60 * 24 * 1000
+        case _:
+            return 1
