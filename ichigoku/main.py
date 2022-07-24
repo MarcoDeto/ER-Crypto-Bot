@@ -4,7 +4,7 @@ from services.messages.tradingview import *
 from services.messages.telegram import *
 from core import *
 
-symbols = ['BTCUSDT']
+symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'DOTUSDT', 'MATICUSDT', 'AVAXUSDT', 'NEARUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'XMRUSDT']
 
 def __main__():
     
@@ -27,7 +27,7 @@ def __main__():
         interval_i = interval_i + 1
     print("Entering Loop")
     detect = get_detect(timeDifference)
-    coin = getSymbol(symbols[0])
+    
     while True:
         interval_i = 0
         delay = int(get_time() - 10000 - timeDifference)
@@ -63,6 +63,7 @@ def __main__():
                     larger_index = interval_i+1
                     larger_interval_trend = ichimokus[larger_index][price_i][2]
                 
+                coin = getSymbol(symbols[price_i])
                 checkBreakOut(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel)
                 price_i = price_i + 1
      

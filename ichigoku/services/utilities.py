@@ -4,7 +4,7 @@ import numpy as np
 from config import *
 from datetime import datetime
 from services.strategies.trend import get_interval_trend
-from services.strategies.ichimoku import get_ichimoku
+from services.strategies.ichimoku import set_ichimoku
 
 
 def get_neccesaries(datalist):
@@ -26,12 +26,12 @@ def set_initial_data(data, interval):
     data_array = get_neccesaries(data)
 
     current_candels = data_array[:len(data_array) - 1]
-    current_ichimoku = get_ichimoku(current_candels, interval)
+    current_ichimoku = set_ichimoku(current_candels, interval)
 
     trend = get_interval_trend(current_ichimoku)
 
     last_candels = data_array[:len(data_array) - 2]
-    last_ichimoku = get_ichimoku(last_candels, interval)
+    last_ichimoku = set_ichimoku(last_candels, interval)
 
     return (current_ichimoku, last_ichimoku, trend)
 
@@ -78,23 +78,23 @@ def get_operation_info(operation, price):
 def get_delay(interval):
     match (interval):
         case '1m':
-            return 2500
-        case '3m':
-            return 7500
-        case '5m':
             return 10000
-        case '15m':
-            return 12500
-        case '30m':
-            return 15000
-        case '1h':
-            return 27500
-        case '2h':
-            return 25000
-        case '4h':
-            return 27500
-        case '1d':
+        case '3m':
             return 30000
+        case '5m':
+            return 50000
+        case '15m':
+            return 150000
+        case '30m':
+            return 300000
+        case '1h':
+            return 600000
+        case '2h':
+            return 1200000
+        case '4h':
+            return 2400000
+        case '1d':
+            return 14400000
         case _:
             return 1
 

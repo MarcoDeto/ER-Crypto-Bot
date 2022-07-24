@@ -20,7 +20,7 @@ class Ichimoku:
         self.close_price = close_price
 
 
-def get_ichimoku(data_array, interval):
+def set_ichimoku(data_array, interval):
 
     # ICHIMOKU_PARAMS = getIchimokuParams(interval)
     tenkan_sen = get_tenkan_sen(data_array)

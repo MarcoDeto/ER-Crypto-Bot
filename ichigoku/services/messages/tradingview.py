@@ -11,7 +11,8 @@ from selenium.webdriver.chrome.service import Service
 from services.utilities import get_interval_index
 
 try:
-    driver = Safari()
+    driver = None
+    #driver = Safari()
 except:
     try:
         driver = Edge()
