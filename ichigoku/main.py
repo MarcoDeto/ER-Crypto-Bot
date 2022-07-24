@@ -26,11 +26,11 @@ def __main__():
         ichimokus.append(dist_data)
         interval_i = interval_i + 1
     print("Entering Loop")
-    detect = getDetect(timeDifference)
+    detect = get_detect(timeDifference)
     coin = getSymbol(symbols[0])
     while True:
         interval_i = 0
-        delay = int(getTime() - 10000 - timeDifference)
+        delay = int(get_time() - 10000 - timeDifference)
         for interval in INTERVALS:
             difference = int(delay // get_delay(interval))
             check_value = detect[interval_i]

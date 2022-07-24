@@ -4,7 +4,7 @@ import numpy as np
 from config import *
 from datetime import datetime
 from services.strategies.trend import get_interval_trend
-from services.strategies.ichimoku import getIchimoku
+from services.strategies.ichimoku import get_ichimoku
 
 
 def get_neccesaries(datalist):
@@ -21,17 +21,17 @@ def get_close_prices(datalist):
     return np.array(returndata)
 
 
-def setInitialData(data, interval):
+def set_initial_data(data, interval):
 
     data_array = get_neccesaries(data)
 
-    trend = get_interval_trend(data)
-
     current_candels = data_array[:len(data_array) - 1]
-    current_ichimoku = getIchimoku(current_candels, interval)
+    current_ichimoku = get_ichimoku(current_candels, interval)
+
+    trend = get_interval_trend(current_ichimoku)
 
     last_candels = data_array[:len(data_array) - 2]
-    last_ichimoku = getIchimoku(last_candels, interval)
+    last_ichimoku = get_ichimoku(last_candels, interval)
 
     return (current_ichimoku, last_ichimoku, trend)
 
@@ -39,12 +39,12 @@ def setInitialData(data, interval):
 def distribute_data(datadict, interval):
     result = []
     for symbol in datadict:
-        ichimokuStatus = setInitialData(datadict[symbol], interval)
+        ichimokuStatus = set_initial_data(datadict[symbol], interval)
         result.append(ichimokuStatus)
     return result
     
 
-def diffPercent(Xi, Xf, cross):
+def get_diff_percent(Xi, Xf, cross):
     if (cross == 'LONG'):
         return ((float(Xf) - float(Xi)) / float(Xi)) * 100
     if (cross == 'SHORT'):
@@ -53,16 +53,16 @@ def diffPercent(Xi, Xf, cross):
         return 0
 
 
-def diffTime(open, close):
+def get_diff_time(open, close):
     return close - open
 
 
-def getTime():
+def get_time():
     return int(round(time.time() * 1000))
 
 
-def getDetect(timeDifference):
-    timeStamp = (getTime() - timeDifference)
+def get_detect(timeDifference):
+    timeStamp = (get_time() - timeDifference)
     result = []
     for interval in INTERVALS:
         result.append(int(timeStamp // get_delay(interval)))
@@ -70,8 +70,8 @@ def getDetect(timeDifference):
 
 def get_operation_info(operation, price):
    close_date = datetime.now()
-   time = diffTime(operation['open_date'], close_date)
-   diff = diffPercent(operation['open_price'], float(price), operation['cross'])
+   time = get_diff_time(operation['open_date'], close_date)
+   diff = get_diff_percent(operation['open_price'], float(price), operation['cross'])
    percent = round(diff, 2)
    return (close_date, time, percent)
 

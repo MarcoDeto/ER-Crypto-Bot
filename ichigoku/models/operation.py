@@ -2,7 +2,7 @@
 from bson import ObjectId
 from datetime import datetime
 from services.exchange.binance import *
-from services.utilities import diffPercent, diffTime, get_operation_info
+from services.utilities import get_diff_percent, get_diff_time, get_operation_info
 
 
 class Operation:

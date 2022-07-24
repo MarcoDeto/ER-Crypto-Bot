@@ -1,7 +1,7 @@
 from datetime import datetime
 from bson import ObjectId  # pip3 install pymongo
 from services.exchange.binance import getPrice
-from services.utilities import diffTime, diffPercent
+from services.utilities import get_diff_time, get_diff_percent
 from models.operation import Operation
 
 
