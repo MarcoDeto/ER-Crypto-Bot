@@ -64,10 +64,10 @@ def __main__():
                     larger_index = interval_i+1
                     larger_interval_trend = ichimokus[larger_index][price_i][2]
                 
-                if is_resp_tolerance(interval, er_price, senkou_span_B) == False:
-                    continue
-                coin = get_symbol(symbols[price_i])
-                check_break_out(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel)
+                if is_resp_tolerance(interval, er_price, senkou_span_B) == True:
+                    coin = get_symbol(symbols[price_i])
+                    check_break_out(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel)
+                
                 price_i = price_i + 1
      
             interval_i = interval_i + 1
