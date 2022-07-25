@@ -57,7 +57,7 @@ def get_long_stop_loss(symbol, price_min):
        "status": 'OPEN',
        "cross": 'LONG',
        'open_price': {'$lt': price_min},
-       'close_price': {'$eq': None}
+       #'close_price': {'$eq': None}
    }
 
 
@@ -67,7 +67,7 @@ def get_short_stop_loss(symbol, price_max):
        "status": 'OPEN',
        "cross": 'SHORT',
        'open_price': {'$gt': price_max},
-       'close_price': {'$eq': None}
+       #'close_price': {'$eq': None}
    }
 
 

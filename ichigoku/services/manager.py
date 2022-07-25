@@ -58,7 +58,7 @@ def check_trading_stops(my_channel, symbol, interval, price, kijun_sen):
    trading_stops = get_trading_stops(symbol, interval, price, kijun_sen)
    for operation in trading_stops:
       print('TRADING STOP')
-      close_operation(my_channel, operation, price)
+      close_operation(my_channel, operation, price, stop_loss=False)
 
 
 def check_take_profit(my_channel, symbol, interval, price, close_prices):
@@ -77,5 +77,5 @@ def check_take_profit(my_channel, symbol, interval, price, close_prices):
 
    for operation in take_profits:
       print('TAKE PROFIT')
-      close_operation(my_channel, operation, price)
+      close_operation(my_channel, operation, price, stop_loss=False)
    

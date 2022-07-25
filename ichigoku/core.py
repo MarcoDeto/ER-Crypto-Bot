@@ -12,6 +12,11 @@ def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interva
     last_price = last.close_price
     senkou_span_B = current.senkou_span_B
     close_price = current.close_price
+
+    # CAMBIARE LOGICA RICONOSCIMENTO TRAND INDICATORE DMI 
+    # RITEST SE SI SVVICINA A SPAN B SI UNA CERTA PERCENTUALE  
+    # AGGIUNGERE CVONTROLLO POSIZIONE MEDIE PRIMA DI APRIRE
+    # AGGIUNGERE AMPIEZZA ICHIMOKU  
     
     #LONG
     if (close_price > senkou_span_B and last_price < last_senkou_span_B):
