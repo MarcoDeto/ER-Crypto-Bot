@@ -6,7 +6,7 @@ from config import *
 from models.operation import Operation
 
 
-async def WebSocket(symbol):
+async def web_socket(symbol):
     client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
     bm = BinanceSocketManager(client)
     # start any sockets here, i.e a trade socket
@@ -55,7 +55,7 @@ def open_order(symbol, side, quantity):
     # return data
 
 
-def getSymbols():
+def get_symbols():
     client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
     coin_list = client.get_all_isolated_margin_symbols()
     filtered = filter(
@@ -75,21 +75,21 @@ def getSymbols():
     return Symbols
 
 
-def getPrice(symbol):
+def get_price(symbol):
     client = Client(BINANCE_API_KEY, BINANCE_API_SECRET)
     Cprz = client.futures_symbol_ticker(symbol=symbol)
     return Cprz['price']
 
 
-def diffPercent(Xi, Xf, cross):
+def get_diff_percent(Xi, Xf, cross):
     if (cross == 'LONG'):
         return ((float(Xf) - float(Xi)) / float(Xi)) * 100
-    if (cross == 'SHORT'):
+    elif (cross == 'SHORT'):
         return ((float(Xi) - float(Xf)) / float(Xf)) * 100
     else:
         return 0
 
 
-def diffTime(open, close):
+def get_diff_time(open, close):
     return close - open
 

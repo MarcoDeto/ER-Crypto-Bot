@@ -3,6 +3,7 @@ import time
 import numpy as np
 from config import *
 from datetime import datetime
+from services.settings import *
 from services.strategies.trend import get_interval_trend
 from services.strategies.ichimoku import set_ichimoku
 
@@ -68,6 +69,7 @@ def get_detect(timeDifference):
         result.append(int(timeStamp // get_delay(interval)))
     return result
 
+
 def get_operation_info(operation, price):
    close_date = datetime.now()
    time = get_diff_time(operation['open_date'], close_date)
@@ -75,77 +77,19 @@ def get_operation_info(operation, price):
    percent = round(diff, 2)
    return (close_date, time, percent)
 
-def get_delay(interval):
-    match (interval):
-        case '1m':
-            return 10000
-        case '3m':
-            return 30000
-        case '5m':
-            return 50000
-        case '15m':
-            return 150000
-        case '30m':
-            return 300000
-        case '1h':
-            return 600000
-        case '2h':
-            return 1200000
-        case '4h':
-            return 2400000
-        case '1d':
-            return 14400000
-        case _:
-            return 1
+
+def is_resp_tolerance(interval, price, span_B):
+    max_tollerance = get_open_tollerance(interval)
+    differece = 0
+    if float(price) > float(span_B):
+        differece = ((float(price) - float(span_B)) / float(span_B)) * 100
+    else:
+        differece = ((float(span_B) - float(price)) / float(price)) * 100
+    
+    if differece > max_tollerance:
+        return False
+    
+    return True
 
 
-def get_interval_index(interval):
-    match (interval):
-        case '1m':
-            return 5
-        case '3m':
-            return 6
-        case '5m':
-            return 7
-        case '15m':
-            return 8
-        case '30m':
-            return 9
-        case '45m':
-            return 10
-        case '1h':
-            return 11
-        case '2h':
-            return 12
-        case '3h':
-            return 13
-        case '4h':
-            return 14
-        case '1d':
-            return 15
-        case _:
-            return
 
-
-def get_timestap(interval):
-    match (interval):
-        case '1m':
-            return 60 * 1000
-        case '3m':
-            return 60 * 3 * 1000
-        case '5m':
-            return 60 * 5 * 1000
-        case '15m':
-            return 60 * 15 * 1000
-        case '30m':
-            return 60 * 30 * 1000
-        case '1h':
-            return 60 * 60 * 1000
-        case '2h':
-            return 60 * 60 * 2 * 1000
-        case '4h':
-            return 60 * 60 * 4 * 1000
-        case '1d':
-            return 60 * 60 * 24 * 1000
-        case _:
-            return 1

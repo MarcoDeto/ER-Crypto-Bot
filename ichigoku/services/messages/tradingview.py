@@ -8,7 +8,6 @@ import tkinter as tk
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from services.utilities import get_interval_index
 
 try:
     driver = None
@@ -109,6 +108,23 @@ def get_trading_view_graph(interval, currency, exchange):
     imageLink = safariDriver.find_element_by_class_name('textInput-3WRWEmm7-')
     return(imageLink.get_attribute('value'), safariDriver.current_url)
     '''
+    
+
+def get_interval_index(interval):
+    match (interval):
+        case '1m': return 5
+        case '3m': return 6
+        case '5m': return 7
+        case '15m': return 8
+        case '30m': return 9
+        case '45m': return 10
+        case '1h': return 11
+        case '2h': return 12
+        case '3h': return 13
+        case '4h': return 14
+        case '1d': return 15
+        case _: return
+
 
 def delay():
     time.sleep(1)

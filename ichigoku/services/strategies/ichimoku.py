@@ -47,38 +47,15 @@ def get_kijun_sen(data_array):
 
 def get_senkou_span_A(data_array):
     # Torna indietro di N candele
-    data = data_array[:-ICHIMOKU_PARAMS[1]]
+    data = data_array[:-ICHIMOKU_PARAMS[1] - 1]
     tenkan_sen = get_tenkan_sen(data)
     kijun_sen = get_kijun_sen(data)
     return (tenkan_sen + kijun_sen)/2
 
 def get_senkou_span_B(data_array):
     # Torna indietro di N candele
-    start_index = -( ICHIMOKU_PARAMS[2] + ICHIMOKU_PARAMS[1] - 1 )
-    end_index = -( ICHIMOKU_PARAMS[1] - 1 )
+    start_index = -( ICHIMOKU_PARAMS[2] + ICHIMOKU_PARAMS[1])
+    end_index = -( ICHIMOKU_PARAMS[1])
     long_max = data_array[:,0][start_index:end_index].max()
     lonh_min = data_array[:,1][start_index:end_index].min()
     return (long_max + lonh_min)/2
-
-def get_ichimoku_params(interval):
-    match (interval):
-        case '1m':
-            return [20, 60, 160]
-        case '3m':
-            return [20, 60, 160]
-        case '5m':
-            return [20, 60, 160]
-        case '15m':
-            return [9, 26, 52]
-        case '30m':
-            return [9, 26, 52]
-        case '1h':
-            return [9, 26, 52]
-        case '2h':
-            return [9, 26, 52]
-        case '4h':
-            return [9, 26, 52]
-        case '1d':
-            return [9, 26, 52]
-        case _:
-            return None

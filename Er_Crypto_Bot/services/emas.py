@@ -1,6 +1,6 @@
 import time
 import numpy as np
-from services.exchange.binance import getPrice
+from services.exchange.binance import get_price
 from models.enums import CrossType, Status
 from services.coins import checkOperation, createOperation, updateOperation
 from services.database.mongoDB import getEMA, insertEMA, checkStopLoss, updateEMA
@@ -12,7 +12,7 @@ async def checkEMAs(data, coin, interval, my_channel):
 
     close_prices = await get_close_data(data)
 
-    priceToCheck = getPrice(coin['symbol'])
+    priceToCheck = get_price(coin['symbol'])
     await checkStopLoss(coin['symbol'], priceToCheck, my_channel)
 
     for main_ema in MAIN_EMAS:

@@ -22,7 +22,7 @@ def send_open_messages(my_channel, link, operation):
     sendDiscordMessage(message)
 
 
-def send_close_messages(my_channel, link, operation, stop_loss):
+def send_close_messages(my_channel, link, operation, stop_loss=False):
 
     minutes = round(int(operation['seconds']) / 60, 1)
     order = '**ORDER CLOSE** ✅\n\n'

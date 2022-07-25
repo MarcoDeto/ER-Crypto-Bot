@@ -1,6 +1,6 @@
 from datetime import datetime
 from bson import ObjectId  # pip3 install pymongo
-from services.exchange.binance import getPrice
+from services.exchange.binance import get_price
 from services.utilities import get_diff_time, get_diff_percent
 from models.operation import Operation
 
@@ -22,18 +22,13 @@ def get_operation_number(coin, interval):
    }
 
 
-def get_open_ichimoku(coin, interval, cross):
+def get_open_ichimoku(coin, cross, interval):
    return {
        'symbol': coin['symbol'],
        'time_frame': interval,
        "status": 'OPEN',
        "cross": cross,
    }
-
-
-
-
-
 def get_long_trading_stop(symbol, interval, price_max):
    return {
        'symbol': symbol,

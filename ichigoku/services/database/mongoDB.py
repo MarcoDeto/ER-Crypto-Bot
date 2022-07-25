@@ -3,6 +3,7 @@ from bson import ObjectId  # pip3 install pymongo
 from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 
 import pymongo
+from services.settings import *
 from models.operation import *
 from services.database.query import *
 from services.exchange.bybit import *
@@ -103,16 +104,17 @@ def get_trading_stops(symbol, interval, price, kijun_sen):
 
 
 
-def get_stop_losses(symbol, price):
+def get_stop_losses(symbol, interval, price):
    result = []
-   price_min = (float(price) - (float(price) * 0.95 / 100))
+   tollerance = get_stop_loss_tollerance(interval)
+   price_min = (float(price) - (float(price) * tollerance / 100))
    query = get_long_stop_loss(symbol, price_min)
    item_details = collection.find(query)
 
    for item in item_details:
       result.append(item)
 
-   price_max = (float(price) + (float(price) * 0.95 / 100))
+   price_max = (float(price) + (float(price) * tollerance / 100))
    query = get_short_stop_loss(symbol, price_max)
    item_details = collection.find(query)
 

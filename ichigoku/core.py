@@ -5,14 +5,14 @@ from models.enums import *
 from services.utilities import *
 
 
-def checkBreakOut(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel):
+def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel):
     current = ichimokus_data[0]
     last = ichimokus_data[1]
     last_senkou_span_B = last.senkou_span_B
     last_price = last.close_price
     senkou_span_B = current.senkou_span_B
     close_price = current.close_price
-
+    
     #LONG
     if (close_price > senkou_span_B and last_price < last_senkou_span_B):
 

@@ -6,7 +6,7 @@ from services.strategies.ichimoku import *
 
 client = Client(BINANCE_API_KEY, BINANCE_API_SECRET, testnet=False)
 
-def getSymbols():
+def get_symbols():
     coin_list = client.get_all_isolated_margin_symbols()
     filtered = filter(
         lambda coin: coin['quote'] == 'USDT' or coin['quote'] == 'BTC', coin_list)
@@ -25,13 +25,13 @@ def getSymbols():
     return Symbols
 
 
-def getSymbol(symbol):
+def get_symbol(symbol):
     coin_list = client.get_all_isolated_margin_symbols()
     filtered = list(filter(lambda coin: coin['symbol'] == symbol, coin_list))
     return filtered[0]
 
 
-def getTimeDifference():
+def get_time_difference():
     data = client.futures_klines(symbol='BTCUSDT', interval='1m', limit=1)
     server_time = int(round(time.time() * 1000))
     binance_time = (data[0][0])
@@ -48,7 +48,7 @@ async def get_klines(symbol, interval):
             print('get_klines Error')
 
 
-async def runKlines(interval, symbols):
+async def run_klines(interval, symbols):
     tasks = []
     for symbol in symbols:
         currentSymbol = symbol
@@ -59,9 +59,9 @@ async def runKlines(interval, symbols):
     return responses
     
 
-def getData(interval, symbols):
+def get_data(interval, symbols):
     loop = asyncio.get_event_loop()
-    future = asyncio.ensure_future(runKlines(interval, symbols))
+    future = asyncio.ensure_future( run_klines(interval, symbols) )
     responses = loop.run_until_complete(future)
     returndict = {}
     for i in range(len(symbols)):
@@ -69,7 +69,7 @@ def getData(interval, symbols):
     return returndict
 
 
-def getCurrentPrices(symbols):
+def get_current_prices(symbols):
     result = []
     for symbol in symbols:
         Cprz = client.futures_symbol_ticker(symbol=symbol)
@@ -78,7 +78,7 @@ def getCurrentPrices(symbols):
 
     return result
 
-def getPrice(symbol):
+def get_price(symbol):
     price = None
     while price == None:
         try: 

@@ -18,7 +18,7 @@ def open_operation(my_channel, ichimoku):
       link = get_trading_view_graph(
           ichimoku.time_frame, ichimoku.symbol, 'BYBIT')
 
-   open_price = float(getPrice(ichimoku.symbol))
+   open_price = float(get_price(ichimoku.symbol))
    operation = get_insert_ichimoku(ichimoku, open_price)
 
    insert_ichiGoku(operation)
@@ -38,16 +38,16 @@ def close_operation(my_channel, ichimoku, price, stop_loss=False):
           ichimoku['time_frame'], ichimoku['symbol'], 'BYBIT')
 
    operation = get_take_profit(ichimoku, price)
-   if (stop_loss == False):
+   if (stop_loss == True):
       operation = get_stop_loss(ichimoku, price)
 
    update_ichiGoku(operation)
    send_close_messages(my_channel, link, operation, stop_loss)
 
 
-def check_stop_loss(my_channel, symbol, price):
+def check_stop_loss(my_channel, symbol, interval, price):
 
-   stop_losses = get_stop_losses(symbol, price)
+   stop_losses = get_stop_losses(symbol, interval, price)
    for operation in stop_losses:
       print('STOP LOSS')
       close_operation(my_channel, operation, price, stop_loss=True)

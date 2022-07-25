@@ -4,10 +4,9 @@ from pymongo import MongoClient  # pip3 install "pymongo[srv]"
 from datetime import datetime
 
 import pymongo
-from services.messages.telegram import sendMessage
+from ichigoku.services.exchange.binance import get_price
 from config import CONNECTION_STRING
 from models.operation import Operation
-from services.exchange.binance import *
 
 
 def getConnection():
@@ -75,7 +74,7 @@ async def insertEMA(operation: Operation):
        'isMarginTrade': operation.isMarginTrade,
        'isBuyAllowed': operation.isBuyAllowed,
        'isSellAllowed': operation.isSellAllowed,
-       'open_price': float(getPrice(operation.symbol)),
+       'open_price': float(get_price(operation.symbol)),
        'close_price': None,
        'open_date': datetime.now(),
        'close_date': None,
@@ -103,7 +102,7 @@ async def updateEMA(operation: Operation, coin: Operation, my_channel):
    collection = getConnection()
    open_price = coin['open_price']
    symbol = coin['symbol']
-   close_price = float(getPrice(symbol))
+   close_price = float(get_price(symbol))
    open_date = coin['open_date']
    close_date = datetime.now()
    cross = coin['cross']
@@ -171,7 +170,7 @@ async def checkStopLoss(symbol, price, my_channel):
       print('STOP LOSS')
       collection = getConnection()
       open_price = operation['open_price']
-      close_price = float(getPrice(operation['symbol']))
+      close_price = float(get_price(operation['symbol']))
       open_date = operation['open_date']
       close_date = datetime.now()
       percent = round(diffPercent(open_price, close_price, operation['cross']), 2)
