@@ -12,7 +12,7 @@ def __main__():
     #init_tradingview()
     #get_trading_view_graph('1m', 'BTCUSDT', 'BINANCE')
     init_telegram()
-    my_channel = get_channel()
+    telegram = get_channel()
     timeDifference = get_time_difference()
     print('Making initial API call')
     print('Getting Kline Data')
@@ -46,16 +46,16 @@ def __main__():
             for symbol in symbols:
                 
                 price = get_price(symbol)
-                check_stop_losses(my_channel, symbol, price)
+                check_stop_losses(telegram, symbol, price)
 
                 ichimokus_data = ichimokus[interval_i][symbol_i]
                 kijun_sen = ichimokus_data[0].kijun_sen
                 senkou_span_B = ichimokus_data[0].senkou_span_B
-                check_trading_stops(my_channel, symbol, interval, price, kijun_sen)
+                check_trailing_stops(telegram, symbol, interval, price, kijun_sen)
 
                 candles_data = symbols_data[interval_i][symbol]
                 close_prices = get_close_prices(candles_data)
-                check_take_profits(my_channel, symbol, interval, price, close_prices)
+                check_take_profits(telegram, symbol, interval, price, close_prices)
                 
                 if is_resp_tolerance(interval, price, senkou_span_B) == True:
                     
@@ -64,7 +64,7 @@ def __main__():
                     if (interval_i != len(INTERVALS)-1):
                         larger_index = interval_i+1
                         larger_interval_trend = ichimokus[larger_index][symbol_i][2]
-                    check_break_out(coin, interval, close_prices, ichimokus_data, larger_interval_trend, my_channel)
+                    check_break_out(coin, interval, close_prices, ichimokus_data, larger_interval_trend, telegram)
                 
                 symbol_i = symbol_i + 1
      

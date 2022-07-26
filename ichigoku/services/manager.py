@@ -7,7 +7,7 @@ from services.exchange.binance import *
 from services.exchange.bybit import *
 
 
-def open_operation(my_channel, ichimoku: Operation):
+def open_operation(telegram, ichimoku: Operation):
    link = None
    price = get_price(ichimoku.symbol)
    tollerance = get_stop_loss_tollerance(ichimoku.time_frame)
@@ -30,10 +30,10 @@ def open_operation(my_channel, ichimoku: Operation):
    operation = get_insert_ichimoku(ichimoku, price, stop_min, stop_loss, take_profit)
 
    insert_ichiGoku(operation)
-   send_open_messages(my_channel, link, operation)
+   send_open_messages(telegram, link, operation)
 
 
-def close_operation(my_channel, ichimoku, price, status):
+def close_operation(telegram, ichimoku, price, status):
    link = None
    if (ichimoku['cross'] == 'LONG'):
       close_binance_order(ichimoku['symbol'], 10)
@@ -48,31 +48,31 @@ def close_operation(my_channel, ichimoku, price, status):
    operation = get_update_ichimoku(ichimoku, price, status)
 
    update_ichiGoku(operation)
-   send_close_messages(my_channel, link, operation, status)
+   send_close_messages(telegram, link, operation, status)
 
 
-def check_stop_losses(my_channel, symbol, price):
+def check_stop_losses(telegram, symbol, price):
 
    stop_losses = get_stop_losses(symbol, price)
    for operation in stop_losses:
       print('STOP LOSS')
-      close_operation(my_channel, operation, price, status='STOP LOSS')
+      close_operation(telegram, operation, price, status='STOP LOSS')
 
 
-def check_trading_stops(my_channel, symbol, interval, price, kijun_sen):
+def check_trailing_stops(telegram, symbol, interval, price, kijun_sen):
    
-   trading_stops = get_trading_stops(symbol, interval, price, kijun_sen)
-   for operation in trading_stops:
-      print('TRADING STOP')
-      close_operation(my_channel, operation, price, status='TRADING STOP')
+   trailing_stops = get_trailing_stops(symbol, interval, price, kijun_sen)
+   for operation in trailing_stops:
+      print('TRAILING STOP')
+      close_operation(telegram, operation, price, status='TRAILING STOP')
 
 
-def check_take_profits(my_channel, symbol, interval, price, close_prices):
+def check_take_profits(telegram, symbol, interval, price, close_prices):
 
    take_profits = get_take_profits(symbol, price)
    for operation in take_profits:
       print('TAKE PROFIT')
-      close_operation(my_channel, operation, price, status='TAKE PROFIT')
+      close_operation(telegram, operation, price, status='TAKE PROFIT')
 
    take_profits = []
 
@@ -88,5 +88,5 @@ def check_take_profits(my_channel, symbol, interval, price, close_prices):
 
    for operation in take_profits:
       print('DB TAKE PROFIT')
-      close_operation(my_channel, operation, price, status='DB TAKE PROFIT')
+      close_operation(telegram, operation, price, status='DB TAKE PROFIT')
    

@@ -32,7 +32,7 @@ def get_open_ichimoku(coin, cross, interval):
    }
 
 
-def get_long_trading_stop(symbol, interval, price):
+def get_long_trailing_stop(symbol, interval, price):
    return {
        'symbol': symbol,
        'status': 'OPEN',
@@ -43,7 +43,7 @@ def get_long_trading_stop(symbol, interval, price):
    }
 
 
-def get_short_trading_stop(symbol, interval, price):
+def get_short_trailing_stop(symbol, interval, price):
    return {
        'symbol': symbol,
        'status': 'OPEN',

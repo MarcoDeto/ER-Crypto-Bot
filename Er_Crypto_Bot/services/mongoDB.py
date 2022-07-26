@@ -97,7 +97,7 @@ async def insertEMA(operation: Operation):
       open_order(operation.symbol, 'SELL', 10)
 
 
-async def updateEMA(operation: Operation, coin: Operation, my_channel):
+async def updateEMA(operation: Operation, coin: Operation, telegram):
    print('UPDATE')
    collection = getConnection()
    open_price = coin['open_price']
@@ -137,10 +137,10 @@ async def updateEMA(operation: Operation, coin: Operation, my_channel):
       open_order(symbol, 'SELL', 10)
    if (cross == 'SHORT'):
       open_order(symbol, 'BUY', 10)
-   await sendMessage(my_channel, symbol, cross, open_date, open_price, close_price, percent, time.seconds, coin['time_frame'], coin['ema_second'])
+   await sendMessage(telegram, symbol, cross, open_date, open_price, close_price, percent, time.seconds, coin['time_frame'], coin['ema_second'])
 
 
-async def checkStopLoss(symbol, price, my_channel):
+async def checkStopLoss(symbol, price, telegram):
    
    collection = getConnection()
    long_price_max = (float(price) + (float(price) * 0.5 / 100))
@@ -198,7 +198,7 @@ async def checkStopLoss(symbol, price, my_channel):
          'stop_loss': True
       }
       collection.update_one({'_id': operation['_id']}, {"$set": EMA}, upsert=False)
-      await sendMessage(my_channel, symbol, operation['cross'], open_date, open_price, close_price, percent, time.seconds, operation['time_frame'], operation['ema_second'], stop_loss=True)
+      await sendMessage(telegram, symbol, operation['cross'], open_date, open_price, close_price, percent, time.seconds, operation['time_frame'], operation['ema_second'], stop_loss=True)
 
 
 

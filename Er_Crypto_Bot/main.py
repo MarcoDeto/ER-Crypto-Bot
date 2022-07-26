@@ -5,7 +5,7 @@ from services.exchange.binance import get_klines, getSymbols
 from services.coins import isToSkip
 from services.emas import checkEMAs
 
-async def intervaLoop(interval, my_channel):
+async def intervaLoop(interval, telegram):
     
     print('\nSTART')
     print(interval)
@@ -22,7 +22,7 @@ async def intervaLoop(interval, my_channel):
         print(datetime.now())
         print(interval + '\n')
         candles = get_klines(symbol, interval)
-        await checkEMAs(candles, coin, interval, my_channel)
+        await checkEMAs(candles, coin, interval, telegram)
 
 
 def getDelay(time_frame):
@@ -56,18 +56,18 @@ def getDelay(time_frame):
 async def main():
 
     await initTelegram()
-    my_channel = await getChannel()
+    telegram = await getChannel()
     # Schedule three calls *concurrently*:
     L = await asyncio.gather(
-        intervaLoop('1m', my_channel),
-        intervaLoop('3m', my_channel),
-        intervaLoop('5m', my_channel),
-        intervaLoop('15m', my_channel),
-        intervaLoop('30m', my_channel),
-        intervaLoop('1h', my_channel),
-        intervaLoop('2h', my_channel),
-        intervaLoop('4h', my_channel),
-        intervaLoop('1d', my_channel),
+        intervaLoop('1m', telegram),
+        intervaLoop('3m', telegram),
+        intervaLoop('5m', telegram),
+        intervaLoop('15m', telegram),
+        intervaLoop('30m', telegram),
+        intervaLoop('1h', telegram),
+        intervaLoop('2h', telegram),
+        intervaLoop('4h', telegram),
+        intervaLoop('1d', telegram),
     )
     print(L)
 

@@ -2,7 +2,7 @@ from services.messages.discord import sendDiscordMessage
 from services.messages.telegram import sendTelegramMessage
 
 
-def send_open_messages(my_channel, link, operation):
+def send_open_messages(telegram, link, operation):
 
     order = '\n🎉 🆕 🥳' + '\n**ORDER OPEN**\n\n'
     symbol_cross = '**' + operation['symbol'] + ' - BUY 🟢'
@@ -17,11 +17,11 @@ def send_open_messages(my_channel, link, operation):
     graph_link = '' if link == None else str('\n' + link + '\n')
 
     message = order + symbol_cross + open_price + stop_loss + take_profit + interval + graph_link
-    sendTelegramMessage(my_channel, message)
+    sendTelegramMessage(telegram, message)
     sendDiscordMessage(message)
 
 
-def send_close_messages(my_channel, link, operation, status):
+def send_close_messages(telegram, link, operation, status):
     start = ''
     order = ''
     profit = ''
@@ -50,5 +50,5 @@ def send_close_messages(my_channel, link, operation, status):
 
     message = start + order + symbolCross + openDate + openPrice + closePrice + profit + duration + interval + graph_link
  
-    sendTelegramMessage(my_channel, message)
+    sendTelegramMessage(telegram, message)
     sendDiscordMessage(message)

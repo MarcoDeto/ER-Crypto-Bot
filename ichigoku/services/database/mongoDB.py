@@ -44,7 +44,7 @@ def getIchimokuDB(coin, cross, interval):
    return coin
 
 
-def getOperationDB(coin, cross, interval):
+def get_operation_DB(coin, cross, interval):
    operationDB = getIchimokuDB(coin, cross, interval)
    if (operationDB):
        return operationDB
@@ -74,15 +74,15 @@ def insert_ichiGoku(ichimoku):
    collection.insert_one(ichimoku)
 
 
-def get_trading_stops(symbol, interval, price, kijun_sen):
+def get_trailing_stops(symbol, interval, price, kijun_sen):
    item_details = None
    result = []
    if (price < kijun_sen):
-      query = get_long_trading_stop(symbol, interval, price)
+      query = get_long_trailing_stop(symbol, interval, price)
       item_details = collection.find(query)
 
    elif (price > kijun_sen):
-      query = get_short_trading_stop(symbol, interval, price)
+      query = get_short_trailing_stop(symbol, interval, price)
       item_details = collection.find(query)
 
    for item in item_details:

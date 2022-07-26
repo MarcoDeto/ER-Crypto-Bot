@@ -8,12 +8,12 @@ from config import MAIN_EMAS, SECOND_EMAS
 import talib #pip3 install ta-lib
 
 
-async def checkEMAs(data, coin, interval, my_channel):
+async def checkEMAs(data, coin, interval, telegram):
 
     close_prices = await get_close_data(data)
 
     priceToCheck = get_price(coin['symbol'])
-    await checkStopLoss(coin['symbol'], priceToCheck, my_channel)
+    await checkStopLoss(coin['symbol'], priceToCheck, telegram)
 
     for main_ema in MAIN_EMAS:
         for second_ema in SECOND_EMAS:
@@ -33,9 +33,9 @@ async def checkEMAs(data, coin, interval, my_channel):
                 continue
 
             if (ema_short > ema_long and last_ema_short < last_ema_long):
-                await Short(coin, main_ema, second_ema, interval, my_channel)
+                await Short(coin, main_ema, second_ema, interval, telegram)
             if (ema_short < ema_long and last_ema_short > last_ema_long):
-                await Long(coin, main_ema, second_ema, interval, my_channel)
+                await Long(coin, main_ema, second_ema, interval, telegram)
 
 
 def getOperationDB(coin, main_ema, second_ema, interval): 
@@ -45,7 +45,7 @@ def getOperationDB(coin, main_ema, second_ema, interval):
     return coin
     
 
-async def Long(coin, main_ema, second_ema, interval, my_channel):
+async def Long(coin, main_ema, second_ema, interval, telegram):
 
     print('LONG'+' '+interval+' '+str(second_ema))
     coin = getOperationDB(coin, main_ema, second_ema, interval)
@@ -54,13 +54,13 @@ async def Long(coin, main_ema, second_ema, interval, my_channel):
     if (emaCross == False): return
 
     if (emaCross.operation_type == Status.CLOSE):
-        await updateEMA(emaCross, coin, my_channel)
+        await updateEMA(emaCross, coin, telegram)
         emaCross = updateOperation(newOperation, coin, main_ema, second_ema, interval)
 
     await insertEMA(emaCross)
         
 
-async def Short(coin, main_ema, second_ema, interval, my_channel):
+async def Short(coin, main_ema, second_ema, interval, telegram):
     
     print('SHORT'+' '+interval+' '+str(second_ema))
     coin = getOperationDB(coin, main_ema, second_ema, interval)
@@ -69,7 +69,7 @@ async def Short(coin, main_ema, second_ema, interval, my_channel):
     if (emaCross == False): return
 
     if (emaCross.operation_type == Status.CLOSE):
-        await updateEMA(emaCross, coin, my_channel)
+        await updateEMA(emaCross, coin, telegram)
         emaCross = updateOperation(newOperation, coin, main_ema, second_ema, interval)
 
     await insertEMA(emaCross)

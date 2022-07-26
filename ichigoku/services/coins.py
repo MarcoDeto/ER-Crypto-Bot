@@ -17,7 +17,7 @@ def isToSkip(symbol):
    return False
 
 
-def checkOperation(coin, cross, newOperation):
+def check_operation(coin, cross, newOperation):
 
    if (cross == CrossType.LONG):
       return openLongOperation(newOperation, coin)
@@ -28,7 +28,7 @@ def checkOperation(coin, cross, newOperation):
    return False
 
 
-def createOperation(coin, cross, interval):
+def create_operation(coin, cross, interval):
    _id = ObjectId()
    return Operation(
        _id, coin['symbol'], coin['base'], 

@@ -27,9 +27,9 @@ def get_channel():
         return client.loop.run_until_complete(client.get_entity(TELEGRAM_CHANNEL))
     
 
-def sendTelegramMessage(my_channel, message):  
+def sendTelegramMessage(telegram, message):  
 
     with client:
-        return client.loop.run_until_complete(client.send_message(my_channel, message))
+        return client.loop.run_until_complete(client.send_message(telegram, message))
 
 

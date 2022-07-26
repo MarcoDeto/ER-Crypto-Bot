@@ -4,7 +4,7 @@ from services.strategies.double import *
 from models.enums import RSIType
 
 
-def RSIIsAlert(close_prices):
+def RSI_is_alert(close_prices):
    rsi = talib.RSI(close_prices, 5)
    if (rsi[-1] > 80):
       return RSIType.OVERBOUGHT
