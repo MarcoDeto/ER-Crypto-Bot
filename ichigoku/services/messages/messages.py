@@ -4,7 +4,7 @@ from services.messages.telegram import sendTelegramMessage
 
 def send_open_messages(telegram, link, operation):
 
-    order = '\n🎉 🆕 🥳' + '\n**ORDER OPEN**\n\n'
+    order = ' \n🎉 🆕 🥳' + '\n**ORDER OPEN**\n\n'
     symbol_cross = '**' + operation['symbol'] + ' - BUY 🟢'
     interval = '\n**TIME FRAME**: ' + str(operation['time_frame']) + ' 🕒'
     open_price = '\nOPEN PRICE**: ' + str(operation['open_price']) + ' 🛒'

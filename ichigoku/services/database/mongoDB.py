@@ -85,8 +85,9 @@ def get_trailing_stops(symbol, interval, price, kijun_sen):
       query = get_short_trailing_stop(symbol, interval, price)
       item_details = collection.find(query)
 
-   for item in item_details:
-      result.append(item)
+   if item_details != None:
+      for item in item_details:
+         result.append(item)
    return result
 
 
