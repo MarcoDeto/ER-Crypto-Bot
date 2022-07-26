@@ -1,3 +1,4 @@
+from models.enums import CrossType
 from services.database.mongoDB import *
 from services.strategies.trend import *
 from services.messages.messages import *
@@ -6,26 +7,33 @@ from services.exchange.binance import *
 from services.exchange.bybit import *
 
 
-def open_operation(my_channel, ichimoku):
+def open_operation(my_channel, ichimoku: Operation):
    link = None
-   if (ichimoku.cross == 'LONG'):
-      open_binance_order(ichimoku['symbol'], 10)
+   price = get_price(ichimoku.symbol)
+   tollerance = get_stop_loss_tollerance(ichimoku.time_frame)
+   stop_min = (price + (price * 0.95 / 100))
+   stop_loss = (price - (price * tollerance / 100))
+   take_profit = (price + (price * (tollerance * 2) / 100))
+
+   if (ichimoku.cross == CrossType.LONG):
+      open_binance_order(ichimoku.symbol, 10, stop_loss)
       link = get_trading_view_graph(
           ichimoku.time_frame, ichimoku.symbol, 'BINANCE')
 
-   elif(ichimoku.cross == 'SHORT'):
-      open_bybit_order(ichimoku.symbol, 10)
+   elif(ichimoku.cross == CrossType.SHORT):
+      stop_loss = (price + (price * tollerance / 100))
+      take_profit = (price - (price * (tollerance * 2) / 100))
+      open_bybit_order(ichimoku.symbol, 10, stop_loss)
       link = get_trading_view_graph(
           ichimoku.time_frame, ichimoku.symbol, 'BYBIT')
-
-   open_price = float(get_price(ichimoku.symbol))
-   operation = get_insert_ichimoku(ichimoku, open_price)
+   
+   operation = get_insert_ichimoku(ichimoku, price, stop_min, stop_loss, take_profit)
 
    insert_ichiGoku(operation)
    send_open_messages(my_channel, link, operation)
 
 
-def close_operation(my_channel, ichimoku, price, stop_loss=False):
+def close_operation(my_channel, ichimoku, price, status):
    link = None
    if (ichimoku['cross'] == 'LONG'):
       close_binance_order(ichimoku['symbol'], 10)
@@ -37,20 +45,18 @@ def close_operation(my_channel, ichimoku, price, stop_loss=False):
       link = get_trading_view_graph(
           ichimoku['time_frame'], ichimoku['symbol'], 'BYBIT')
 
-   operation = get_take_profit(ichimoku, price)
-   if (stop_loss == True):
-      operation = get_stop_loss(ichimoku, price)
+   operation = get_update_ichimoku(ichimoku, price, status)
 
    update_ichiGoku(operation)
-   send_close_messages(my_channel, link, operation, stop_loss)
+   send_close_messages(my_channel, link, operation, status)
 
 
-def check_stop_loss(my_channel, symbol, interval, price):
+def check_stop_losses(my_channel, symbol, price):
 
-   stop_losses = get_stop_losses(symbol, interval, price)
+   stop_losses = get_stop_losses(symbol, price)
    for operation in stop_losses:
       print('STOP LOSS')
-      close_operation(my_channel, operation, price, stop_loss=True)
+      close_operation(my_channel, operation, price, status='STOP LOSS')
 
 
 def check_trading_stops(my_channel, symbol, interval, price, kijun_sen):
@@ -58,24 +64,29 @@ def check_trading_stops(my_channel, symbol, interval, price, kijun_sen):
    trading_stops = get_trading_stops(symbol, interval, price, kijun_sen)
    for operation in trading_stops:
       print('TRADING STOP')
-      close_operation(my_channel, operation, price, stop_loss=False)
+      close_operation(my_channel, operation, price, status='TRADING STOP')
 
 
-def check_take_profit(my_channel, symbol, interval, price, close_prices):
+def check_take_profits(my_channel, symbol, interval, price, close_prices):
+
+   take_profits = get_take_profits(symbol, price)
+   for operation in take_profits:
+      print('TAKE PROFIT')
+      close_operation(my_channel, operation, price, status='TAKE PROFIT')
 
    take_profits = []
 
    double_top_trend = is_double_top_trend(close_prices, interval)
    double_top_rsi = is_double_top_rsi(close_prices)
    if (double_top_trend == True and double_top_rsi == True):
-      take_profits = get_long_take_profits(symbol, interval)
+      take_profits = get_double_take_profits(symbol, 'LONG', interval)
    
-   double_bottom_trend = is_double_top_trend(close_prices, interval)
-   double_bottom_rsi = is_double_top_rsi(close_prices)
+   double_bottom_trend = is_double_bottom_trend(close_prices, interval)
+   double_bottom_rsi = is_double_bottom_rsi(close_prices)
    if (double_bottom_trend == True and double_bottom_rsi == True):
-      take_profits = get_short_take_profits(symbol, interval)
+      take_profits = get_double_take_profits(symbol, 'SHORT', interval)
 
    for operation in take_profits:
-      print('TAKE PROFIT')
-      close_operation(my_channel, operation, price, stop_loss=False)
+      print('DB TAKE PROFIT')
+      close_operation(my_channel, operation, price, status='DB TAKE PROFIT')
    

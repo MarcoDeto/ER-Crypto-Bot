@@ -18,6 +18,8 @@ def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interva
     # AGGIUNGERE CVONTROLLO POSIZIONE MEDIE PRIMA DI APRIRE
     # AGGIUNGERE AMPIEZZA ICHIMOKU  
     
+    open_long(coin, interval, my_channel)
+
     #LONG
     if (close_price > senkou_span_B and last_price < last_senkou_span_B):
 
@@ -28,11 +30,11 @@ def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interva
         if is_added == True: return 
 
         elif is_added == False: 
-            openLong(coin, interval, my_channel)
+            open_long(coin, interval, my_channel)
         
         elif is_added == None:
             if (RSIIsAlert(close_prices) == RSIType.OVERBOUGHT):
-                openLong(coin, interval, my_channel)
+                open_long(coin, interval, my_channel)
 
     #SHORT
     if (close_price < senkou_span_B and last_price > last_senkou_span_B):
@@ -44,14 +46,14 @@ def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interva
         if is_added == True: return 
 
         elif is_added == False: 
-            openShort(coin, interval, my_channel)
+            open_short(coin, interval, my_channel)
 
         elif is_added == None:
             if (RSIIsAlert(close_prices) == RSIType.OVERSOLD):
-                openShort(coin, interval, my_channel)
+                open_short(coin, interval, my_channel)
 
 
-def openLong(coin, interval, my_channel):
+def open_long(coin, interval, my_channel):
     print('LONG'+' '+interval)
     newOperation = createOperation(coin, CrossType.LONG, interval)
     coin = getOperationDB(coin, CrossType.LONG, interval)
@@ -62,7 +64,7 @@ def openLong(coin, interval, my_channel):
     open_operation(my_channel, span_B_cross)
 
 
-def openShort(coin, interval, my_channel):
+def open_short(coin, interval, my_channel):
     print('SHORT'+' '+interval)
     newOperation = createOperation(coin, CrossType.SHORT, interval)
     coin = getOperationDB(coin, CrossType.SHORT, interval)
@@ -74,7 +76,7 @@ def openShort(coin, interval, my_channel):
 
 
 def is_just_added(coin, cross, interval):
-    open_operation = checkIfOpen(coin, cross, interval)
+    open_operation = check_if_open(coin, cross, interval)
 
     if (open_operation == None): return None
 

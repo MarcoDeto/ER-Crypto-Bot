@@ -14,8 +14,8 @@ def __main__():
     init_telegram()
     my_channel = get_channel()
     timeDifference = get_time_difference()
-    print("Making initial API call")
-    print("Getting Kline Data")
+    print('Making initial API call')
+    print('Getting Kline Data')
     ichimokus = []
     symbols_data = []
     interval_i = 0
@@ -25,7 +25,7 @@ def __main__():
         dist_data = distribute_data(symbols_data[interval_i], interval)
         ichimokus.append(dist_data)
         interval_i = interval_i + 1
-    print("Entering Loop")
+    print('Entering Loop')
     detect = get_detect(timeDifference)
     
     while True:
@@ -38,16 +38,15 @@ def __main__():
                 detect[interval_i] = difference
                 symbols_data[interval_i] = get_data(interval, symbols)
                 ichimokus[interval_i] = distribute_data(symbols_data[interval_i], interval)
-                print("renew " + interval)
+                print('renew ' + interval)
                 print(datetime.now())
             
             
             symbol_i = 0
             for symbol in symbols:
-
+                
                 price = get_price(symbol)
-
-                check_stop_loss(my_channel, symbol, interval, price)
+                check_stop_losses(my_channel, symbol, price)
 
                 ichimokus_data = ichimokus[interval_i][symbol_i]
                 kijun_sen = ichimokus_data[0].kijun_sen
@@ -56,7 +55,7 @@ def __main__():
 
                 candles_data = symbols_data[interval_i][symbol]
                 close_prices = get_close_prices(candles_data)
-                check_take_profit(my_channel, symbol, interval, price, close_prices)
+                check_take_profits(my_channel, symbol, interval, price, close_prices)
                 
                 if is_resp_tolerance(interval, price, senkou_span_B) == True:
                     

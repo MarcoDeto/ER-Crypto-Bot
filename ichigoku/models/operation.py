@@ -2,7 +2,7 @@
 from bson import ObjectId
 from datetime import datetime
 from services.exchange.binance import *
-from services.utilities import get_diff_percent, get_diff_time, get_operation_info
+from services.utilities import get_operation_info
 
 
 class Operation:
@@ -20,7 +20,7 @@ class Operation:
       self.time_frame = time_frame
 
 
-def get_insert_ichimoku(operation: Operation, open_price):
+def get_insert_ichimoku(operation: Operation, open_price, stop_min, stop_loss, take_profit):
    return {
        '_id': ObjectId(),
        'symbol': operation.symbol,
@@ -39,11 +39,12 @@ def get_insert_ichimoku(operation: Operation, open_price):
        'percent': 0,
        'seconds': 0,
        'status': 'OPEN',
-       'stop_loss': False,
+       'stop_min': round(stop_min, 2),
+       'stop_loss': round(stop_loss, 2),
+       'take_profit': round(take_profit, 2)
    }
 
-
-def get_take_profit(operation, price):
+def get_update_ichimoku(operation, price, status):
    (close_date, time, percent) = get_operation_info(operation, price)
    return {
        '_id': operation['_id'],
@@ -62,29 +63,8 @@ def get_take_profit(operation, price):
        'time_frame': operation['time_frame'],
        'percent': percent,
        'seconds': time.seconds,
-       'status': 'CLOSE',
-       'stop_loss': False
-   }
-
-def get_stop_loss(operation: Operation, price):
-   (close_date, time, percent) = get_operation_info(operation, price)
-   return {
-       '_id': operation['_id'],
-       'symbol': operation['symbol'],
-       'base': operation['base'],
-       'quote': operation['quote'],
-       'isMarginTrade': operation['isMarginTrade'],
-       'isBuyAllowed': True,
-       'isSellAllowed': True,
-       'open_price': operation['open_price'],
-       'close_price': float(price),
-       'open_date': operation['open_date'],
-       'close_date': close_date,
-       'operation_number': operation['operation_number'],
-       'cross': operation['cross'],
-       'time_frame': operation['time_frame'],
-       'percent': percent,
-       'seconds': time.seconds,
-       'status': 'CLOSE',
-       'stop_loss': True
+       'status': status,
+       'stop_min': operation['stop_min'],
+       'stop_loss': operation['stop_loss'],
+       'take_profit': operation['take_profit'],
    }

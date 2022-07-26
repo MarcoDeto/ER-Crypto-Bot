@@ -4,25 +4,25 @@ from services.messages.telegram import sendTelegramMessage
 
 def send_open_messages(my_channel, link, operation):
 
-    order = '**ORDER OPEN**\n\n'
-    symbolCross = '**' + operation['symbol'] + ' - BUY 🟢'
-    openPrice = '\nOPEN PRICE**: ' + str(operation['open_price']) + ' 🛒'
-    interval = '\n**TIME FRAME**: ' + str(operation['time_frame'])
+    order = '\n🎉 🆕 🥳' + '\n**ORDER OPEN**\n\n'
+    symbol_cross = '**' + operation['symbol'] + ' - BUY 🟢'
+    interval = '\n**TIME FRAME**: ' + str(operation['time_frame']) + ' 🕒'
+    open_price = '\nOPEN PRICE**: ' + str(operation['open_price']) + ' 🛒'
+    stop_loss = '\n**STOP LOSS**: ' + str(operation['stop_loss']) + ' ⏹'
+    take_profit = '\n**TAKE PROFIT**: ' + str(operation['take_profit']) + ' 💸'
 
     if (operation['cross'] == 'SHORT'):
-        symbolCross = '**' + operation['symbol'] + ' - SELL 🔴'
+        symbol_cross = '**' + operation['symbol'] + ' - SELL 🔴'
 
-    if (link != None):
-        graph_link = '\n' + link + '\n'
-    else:
-        graph_link = ''
+    graph_link = '' if link == None else str('\n' + link + '\n')
 
-    message = order + symbolCross + openPrice + interval + graph_link
+    message = order + symbol_cross + open_price + stop_loss + take_profit + interval + graph_link
     sendTelegramMessage(my_channel, message)
     sendDiscordMessage(message)
 
 
-def send_close_messages(my_channel, link, operation, stop_loss=False):
+def send_close_messages(my_channel, link, operation, status):
+    start = ''
     order = ''
     profit = ''
     graph_link = ''
@@ -36,22 +36,19 @@ def send_close_messages(my_channel, link, operation, stop_loss=False):
     duration = '\n**TIME**: ' + str(minutes) + 'm ⏰'
     interval = '\n**TIME FRAME**: ' + str(operation['time_frame'])
 
-    if (stop_loss == True):
-        order = '**STOP LOSS** ❌\n\n'
+    percent = operation['percent']
+    if (percent < 0):
+        start = '❌❌❌'
+        order = '**'+status+'** ❌\n\n'
+        profit = '\n**PROFIT**: ' + str(percent) + '% 😔'
     else:
-        if (operation['percent'] < 0):
-            order = '**ORDER CLOSE** ❌\n\n'
-            profit = '\n**PROFIT**: ' + str(operation['percent']) + '% 😔'
-        else:
-            order = '**ORDER CLOSE** ✅\n\n'
-            profit = '\n**PROFIT**: ' + str(operation['percent']) + '% 🤑'
+        start = '✅✅✅'
+        order = '**'+status+'** ✅\n\n'
+        profit = '\n**PROFIT**: ' + str(percent) + '% 🤑'
 
-    if (link != None):
-        graph_link = '\n' + link + '\n'
-    else:
-        graph_link = ''
+    graph_link = '' if link == None else str('\n' + link + '\n')
 
-    message = order + symbolCross + openDate + openPrice + closePrice + profit + duration + interval + graph_link
+    message = start + order + symbolCross + openDate + openPrice + closePrice + profit + duration + interval + graph_link
  
     sendTelegramMessage(my_channel, message)
     sendDiscordMessage(message)

@@ -26,66 +26,69 @@ def get_open_ichimoku(coin, cross, interval):
    return {
        'symbol': coin['symbol'],
        'time_frame': interval,
-       "status": 'OPEN',
-       "cross": cross,
-   }
-def get_long_trading_stop(symbol, interval, price_max):
-   return {
-       'symbol': symbol,
-       "status": 'OPEN',
-       "cross": 'LONG',
-       "time_frame": interval,
-       'open_price': {'$gt': price_max},
+       'status': 'OPEN',
+       'cross': cross,
        'close_price': {'$eq': None}
    }
 
 
-def get_short_trading_stop(symbol, interval, price_min):
+def get_long_trading_stop(symbol, interval, price):
    return {
        'symbol': symbol,
-       "status": 'OPEN',
-       "cross": 'SHORT',
-       "time_frame": interval,
-       'open_price': {'$lt': price_min},
+       'status': 'OPEN',
+       'cross': 'LONG',
+       'time_frame': interval,
+       'stop_min': {'$lt': price},
        'close_price': {'$eq': None}
    }
 
 
-def get_long_stop_loss(symbol, price_min):
+def get_short_trading_stop(symbol, interval, price):
    return {
        'symbol': symbol,
-       "status": 'OPEN',
-       "cross": 'LONG',
-       'open_price': {'$lt': price_min},
-       #'close_price': {'$eq': None}
-   }
-
-
-def get_short_stop_loss(symbol, price_max):
-   return {
-       'symbol': symbol,
-       "status": 'OPEN',
-       "cross": 'SHORT',
-       'open_price': {'$gt': price_max},
-       #'close_price': {'$eq': None}
-   }
-
-
-def get_long_take_profit(symbol, interval):
-   return {
-       'symbol': symbol,
-       "status": 'OPEN',
-       "cross": 'LONG',
-       "time_frame": interval,
+       'status': 'OPEN',
+       'cross': 'SHORT',
+       'time_frame': interval,
+       'stop_min': {'$gt': price},
        'close_price': {'$eq': None}
    }
 
 
-def get_short_take_profit(symbol, interval):
-   return {
-       'symbol': symbol,
-       "status": 'OPEN',
-       "cross": 'SHORT',
-       "time_frame": interval,
-       'close_price': {'$eq': None}
-   }
+def get_long_stop_loss(symbol, price):
+    return {
+        'symbol': symbol,
+        'status': 'OPEN',
+        'cross': 'LONG',
+        'stop_loss': {'$gt': price},
+        'close_price': {'$eq': None}
+    }
+
+
+def get_short_stop_loss(symbol, price):
+    return {
+        'symbol': symbol,
+        'status': 'OPEN',
+        'cross': 'SHORT',
+        'stop_loss': {'$lt': price},
+        'close_price': {'$eq': None}
+    }
+
+
+def get_long_take_profits(symbol, price):
+    return {
+        'symbol': symbol,
+        'status': 'OPEN',
+        'cross': 'LONG',
+        'take_profit': {'$lt': price},
+        'close_price': {'$eq': None}
+    }
+
+
+def get_short_take_profits(symbol, price):
+    return {
+        'symbol': symbol,
+        'status': 'OPEN',
+        'cross': 'SHORT',
+        'take_profit': {'$gt': price},
+        'close_price': {'$eq': None}
+    }

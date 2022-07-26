@@ -84,12 +84,12 @@ def get_price(symbol):
         try: 
             Cprz = client.futures_symbol_ticker(symbol=symbol)
             price = Cprz['price']
-            return price
+            return float(price)
         except:
             print('get_price Error')
 
 
-def open_binance_order(symbol, quantity):
+def open_binance_order(symbol, quantity, stop_loss):
     return None
     # client = Client(TEST_BINANCE_API_KEY, TEST_BINANCE_API_SECRET, testnet=True)
     # data = client.futures_create_order(symbol=symbol,type="MARKET",side=side,quantity=1500,)

@@ -1,6 +1,6 @@
 
 from bson import ObjectId  # pip3 install pymongo
-from pymongo import MongoClient  # pip3 install "pymongo[srv]"
+from pymongo import MongoClient  # pip3 install 'pymongo[srv]'
 
 import pymongo
 from services.settings import *
@@ -31,14 +31,7 @@ def getIchimokus():
 
 def getIchimokuDB(coin, cross, interval):
 
-   count = collection.count_documents({})
-   if (count == 0):
-      return None
-
    query = get_ichimoku(coin, interval, cross)
-   count = collection.count_documents(query)
-   if (count == 0):
-      return coin
 
    item_details = collection.find(query).sort('open_date', pymongo.DESCENDING)
    result = {}
@@ -64,16 +57,9 @@ def getOperationNumber(coin, interval):
    return result + 1
 
 
-def checkIfOpen(coin, cross, interval):
-   count = collection.count_documents({})
-   if (count == 0):
-      return None
+def check_if_open(coin, cross, interval):
 
    query = get_open_ichimoku(coin, cross, interval)
-   count = collection.count_documents(query)
-   if (count == 0):
-      return None
-
    item_details = collection.find(query).sort('open_date', pymongo.ASCENDING)
    result = []
    for item in item_details:
@@ -89,35 +75,55 @@ def insert_ichiGoku(ichimoku):
 
 
 def get_trading_stops(symbol, interval, price, kijun_sen):
+   item_details = None
    result = []
-   if (float(price) < kijun_sen):
-      price_max = (float(price) + (float(price) * 0.95 / 100))
-      query = get_long_trading_stop(symbol, interval, price_max)
-      result = collection.find(query)
+   if (price < kijun_sen):
+      query = get_long_trading_stop(symbol, interval, price)
+      item_details = collection.find(query)
 
-   elif (float(price) > kijun_sen):
-      price_min = (float(price) - (float(price) * 0.95 / 100))
-      query = get_short_trading_stop(symbol, interval, price_min)
-      result = collection.find(query)
+   elif (price > kijun_sen):
+      query = get_short_trading_stop(symbol, interval, price)
+      item_details = collection.find(query)
+
+   for item in item_details:
+      result.append(item)
+   return result
+
+
+def get_stop_losses(symbol, price):
+   result = []
+   query = get_long_stop_loss(symbol, price)
+   item_details = collection.find(query)
+   for item in item_details:
+      result.append(item)
+
+   query = get_short_stop_loss(symbol, price)
+   item_details = collection.find(query)
+   for item in item_details:
+      result.append(item)
 
    return result
 
 
-
-def get_stop_losses(symbol, interval, price):
+def get_take_profits(symbol, price):
    result = []
-   tollerance = get_stop_loss_tollerance(interval)
-   price_min = (float(price) - (float(price) * tollerance / 100))
-   query = get_long_stop_loss(symbol, price_min)
+   query = get_long_take_profits(symbol, price)
    item_details = collection.find(query)
-
    for item in item_details:
       result.append(item)
 
-   price_max = (float(price) + (float(price) * tollerance / 100))
-   query = get_short_stop_loss(symbol, price_max)
+   query = get_short_take_profits(symbol, price)
    item_details = collection.find(query)
+   for item in item_details:
+      result.append(item)
 
+   return result
+
+
+def get_double_take_profits(symbol, cross, interval):
+   result = []
+   query = get_open_ichimoku(symbol, cross, interval)
+   item_details = collection.find(query)
    for item in item_details:
       result.append(item)
 
@@ -125,27 +131,7 @@ def get_stop_losses(symbol, interval, price):
 
 
 def update_ichiGoku(ichimoku):
-   collection.update_one({'_id': ichimoku['_id']}, {"$set": ichimoku}, upsert=False)
-
-
-def get_long_take_profits(symbol, interval):
-   result = []
-   query = get_long_take_profit(symbol, interval)
-   item_details = collection.find(query)
-   for item in item_details:
-      result.append(item)
-
-   return result
-
-
-def get_short_take_profits(symbol, interval):
-   result = []
-   query = get_short_take_profit(symbol, interval)
-   item_details = collection.find(query)
-   for item in item_details:
-      result.append(item)
-   
-   return result
+   collection.update_one({'_id': ichimoku['_id']}, {'$set': ichimoku}, upsert=False)
 
 
 def dropCollection():

@@ -90,6 +90,3 @@ def is_resp_tolerance(interval, price, span_B):
         return False
     
     return True
-
-
-
