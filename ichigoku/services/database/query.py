@@ -1,10 +1,3 @@
-from datetime import datetime
-from bson import ObjectId  # pip3 install pymongo
-from services.exchange.binance import get_price
-from services.utilities import get_diff_time, get_diff_percent
-from models.operation import Operation
-
-
 def get_ichimoku(coin, interval, cross):
    return {
        'symbol': coin['symbol'],

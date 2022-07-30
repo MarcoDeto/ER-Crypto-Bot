@@ -38,11 +38,11 @@ def send_close_messages(telegram, link, operation, status):
 
     percent = operation['percent']
     if (percent < 0):
-        start = '❌❌❌'
+        start = '\n \n❌❌❌\n'
         order = '**'+status+'** ❌\n\n'
         profit = '\n**PROFIT**: ' + str(percent) + '% 😔'
     else:
-        start = '✅✅✅'
+        start = '\n \n✅✅✅\n'
         order = '**'+status+'** ✅\n\n'
         profit = '\n**PROFIT**: ' + str(percent) + '% 🤑'
 

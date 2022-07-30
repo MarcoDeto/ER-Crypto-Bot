@@ -4,8 +4,9 @@ import numpy as np
 from config import *
 from datetime import datetime
 from services.settings import *
-from services.strategies.trend import get_interval_trend
-from services.strategies.ichimoku import set_ichimoku
+from services.strategies.ichimoku import *
+from services.strategies.trend import *
+
 
 
 def get_neccesaries(datalist):
@@ -26,13 +27,13 @@ def set_initial_data(data, interval):
 
     data_array = get_neccesaries(data)
 
-    current_candels = data_array[:len(data_array) - 1]
-    current_ichimoku = set_ichimoku(current_candels, interval)
+    current_candles = data_array[:len(data_array) - 1]
+    current_ichimoku = set_ichimoku(current_candles, interval)
 
-    trend = get_interval_trend(current_ichimoku)
+    trend = get_trend(data, interval)
 
-    last_candels = data_array[:len(data_array) - 2]
-    last_ichimoku = set_ichimoku(last_candels, interval)
+    last_candles = data_array[:len(data_array) - 2]
+    last_ichimoku = set_ichimoku(last_candles, interval)
 
     return (current_ichimoku, last_ichimoku, trend)
 

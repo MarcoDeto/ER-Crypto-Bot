@@ -1,5 +1,5 @@
 
-from bson import ObjectId
+from bson import ObjectId # pip3 install pymongo
 from datetime import datetime
 from services.exchange.binance import *
 from services.utilities import get_operation_info

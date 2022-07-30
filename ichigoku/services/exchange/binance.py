@@ -42,7 +42,7 @@ async def get_klines(symbol, interval):
     data = None
     while data == None:
         try:
-            data = client.futures_klines(symbol=symbol, interval=interval, limit=300)
+            data = client.futures_klines(symbol=symbol, interval=interval, limit=500)
             return data
         except:
             print('get_klines Error')

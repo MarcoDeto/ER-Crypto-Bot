@@ -1,14 +1,13 @@
+import math
 from services.manager import *
 from services.database.mongoDB import *
 from services.messages.tradingview import *
 from services.messages.telegram import *
 from core import *
 
-symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'DOTUSDT', 'MATICUSDT', 'AVAXUSDT']#, 'NEARUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'XMRUSDT']
 
 def __main__():
     
-    global symbols
     #init_tradingview()
     #get_trading_view_graph('1m', 'BTCUSDT', 'BINANCE')
     init_telegram()
@@ -20,7 +19,7 @@ def __main__():
     symbols_data = []
     interval_i = 0
     for interval in INTERVALS:
-        data = get_data(interval, symbols)
+        data = get_data(interval, SYMBOLS)
         symbols_data.append(data)
         dist_data = distribute_data(symbols_data[interval_i], interval)
         ichimokus.append(dist_data)
@@ -36,14 +35,14 @@ def __main__():
             check_value = detect[interval_i]
             if(difference != check_value):
                 detect[interval_i] = difference
-                symbols_data[interval_i] = get_data(interval, symbols)
+                symbols_data[interval_i] = get_data(interval, SYMBOLS)
                 ichimokus[interval_i] = distribute_data(symbols_data[interval_i], interval)
                 print('renew ' + interval)
                 print(datetime.now())
             
             
             symbol_i = 0
-            for symbol in symbols:
+            for symbol in SYMBOLS:
                 
                 price = get_price(symbol)
                 check_stop_losses(telegram, symbol, price)
@@ -58,8 +57,9 @@ def __main__():
                 check_take_profits(telegram, symbol, interval, price, close_prices)
                 
                 if is_resp_tolerance(interval, price, senkou_span_B) == True:
+                #TENERE CONTO DEL RETEST CON CIRCA DIECI CANDELE
                     
-                    coin = get_symbol(symbols[symbol_i])
+                    coin = get_symbol(SYMBOLS[symbol_i])
                     larger_interval_trend = None
                     if (interval_i != len(INTERVALS)-1):
                         larger_index = interval_i+1
