@@ -49,9 +49,6 @@ def get_swings(data, interval):
         elif next_price > float(high[4]):
             high = next
 
-        if high == 0 or low == 0:
-            continue
-
         if is_to_be_ignored(high[4], low[4], interval) == True:
             continue
 
@@ -107,6 +104,10 @@ def get_swings(data, interval):
                         low_swings.append({'index': low_index, 'value': low})
 
     print(interval)
+
+    if len(high_swings) == 0 and len(low_swings) == 0:
+        low_swings.append({'index': low_index, 'value': low})
+        high_swings.append({'index': high_index, 'value': high})
 
     if float(low[4]) < float(low_swings[len(low_swings)-1]['value'][4]):
         if len(low_swings) > len(high_swings):

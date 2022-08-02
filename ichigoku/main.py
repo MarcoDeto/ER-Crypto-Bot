@@ -10,6 +10,7 @@ def __main__():
     
     #init_tradingview()
     #get_trading_view_graph('1m', 'BTCUSDT', 'BINANCE')
+
     init_telegram()
     telegram = get_channel()
     timeDifference = get_time_difference()

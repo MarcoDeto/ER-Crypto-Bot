@@ -32,6 +32,7 @@ def get_long_trailing_stop(symbol, interval, price):
        'cross': 'LONG',
        'time_frame': interval,
        'stop_min': {'$lt': price},
+       'open_price': {'$lt': price},
        'close_price': {'$eq': None}
    }
 
@@ -43,6 +44,7 @@ def get_short_trailing_stop(symbol, interval, price):
        'cross': 'SHORT',
        'time_frame': interval,
        'stop_min': {'$gt': price},
+       'open_price': {'$gt': price},
        'close_price': {'$eq': None}
    }
 

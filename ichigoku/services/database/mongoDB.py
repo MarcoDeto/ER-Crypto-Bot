@@ -17,7 +17,7 @@ from services.exchange.binance import *
 
 client = MongoClient(CONNECTION_STRING)
 mongoDB = client['Er_Crypto_Bot']
-collection = mongoDB['IchiGoku']
+collection = mongoDB['Test']
 
 
 def getIchimokus():

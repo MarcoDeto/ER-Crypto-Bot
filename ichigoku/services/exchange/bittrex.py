@@ -1,10 +1,10 @@
 import requests
 import time as timer
-from app import ichimokuCalculator
 import asyncio
 from aiohttp import ClientSession
 import time
 from datetime import datetime
+
 market_url = "https://bittrex.com/api/v1.1/public/getmarkets"
 markets = requests.get(market_url)
 if(markets.status_code != 200):

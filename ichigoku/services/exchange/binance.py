@@ -26,9 +26,14 @@ def get_symbols():
 
 
 def get_symbol(symbol):
-    coin_list = client.get_all_isolated_margin_symbols()
-    filtered = list(filter(lambda coin: coin['symbol'] == symbol, coin_list))
-    return filtered[0]
+    filtered = []
+    while len(filtered) == 0:
+        try:
+            coin_list = client.get_all_isolated_margin_symbols()
+            filtered = list(filter(lambda coin: coin['symbol'] == symbol, coin_list))
+            return filtered[0]
+        except:
+            print('get_symbol Error')
 
 
 def get_time_difference():
