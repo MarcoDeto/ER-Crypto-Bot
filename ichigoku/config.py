@@ -1,5 +1,5 @@
 SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'DOTUSDT', 'MATICUSDT', 'AVAXUSDT']#, 'NEARUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'XMRUSDT']
-INTERVALS = ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '1d']
+INTERVALS = ['3m', '5m', '15m', '30m', '1h', '2h', '4h', '1d']
 SECOND_EMAS = [25, 50, 60, 123, 200]
 MAIN_EMAS = [10]
 ICHIMOKU_PARAMS = [9, 26, 52, 26]

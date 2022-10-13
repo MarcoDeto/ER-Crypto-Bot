@@ -11,11 +11,6 @@ from config import *
 
 session_unauth = usdt_perpetual.HTTP(endpoint=TEST_BYBIT_BASE_URL)
 
-session_auth = usdt_perpetual.HTTP(
-    endpoint=TEST_BYBIT_BASE_URL,
-    api_key=TEST_BYBIT_API_KEY,
-    api_secret=TEST_BYBIT_API_SECRET
-)
 
 
 def get_bybit_symbols():
@@ -50,7 +45,7 @@ def mark_price_klines(symbol):
         endpoint="https://api-testnet.bybit.com"
     )
     return session_unauth.query_mark_price_kline(
-        symbol='BTCUSDT',
+        symbol=symbol,
         interval=1,
         limit=200,
         from_time=timestamp - 2000
@@ -63,6 +58,11 @@ def get_bybit_price(symbol):
 
 
 def get_wallet_balance():
+    session_auth = inverse_perpetual.HTTP(
+        endpoint=TEST_BYBIT_BASE_URL,
+        api_key=TEST_BYBIT_API_KEY,
+        api_secret=TEST_BYBIT_API_SECRET
+    )
     response = session_auth.get_wallet_balance()
     ADA = response['result']['ADA']
     BIT = response['result']['BIT']
@@ -80,6 +80,12 @@ def get_wallet_balance():
 
 
 def get_usdt_balance():
+    delay()
+    session_auth = inverse_perpetual.HTTP(
+        endpoint=TEST_BYBIT_BASE_URL,
+        api_key=TEST_BYBIT_API_KEY,
+        api_secret=TEST_BYBIT_API_SECRET
+    )
     response = session_auth.get_wallet_balance()
     USDT = response['result']['USDT']
     return USDT['available_balance']
@@ -87,12 +93,19 @@ def get_usdt_balance():
 
 def get_order_quantity(symbol):
     usdt = get_usdt_balance()
+    delay()
     usdt_quantity = (usdt * 3) / 100
     price = get_bybit_price(symbol)
+    delay()
     return round(usdt_quantity / price, 3)
 
 
 def place_order(symbol, side, take_profit, stop_loss, quantity):
+    session_auth = usdt_perpetual.HTTP(
+        endpoint=TEST_BYBIT_BASE_URL,
+        api_key=TEST_BYBIT_API_KEY,
+        api_secret=TEST_BYBIT_API_SECRET
+    )
     return session_auth.place_active_order(
         symbol=symbol,
         side=side,
@@ -107,12 +120,22 @@ def place_order(symbol, side, take_profit, stop_loss, quantity):
 
 
 def get_active_orders(symbol):
+    session_auth = usdt_perpetual.HTTP(
+        endpoint=TEST_BYBIT_BASE_URL,
+        api_key=TEST_BYBIT_API_KEY,
+        api_secret=TEST_BYBIT_API_SECRET
+    )
     return session_auth.get_active_order(
         symbol=symbol
     )['result']
 
 
 def get_order(order_id, symbol):
+    session_auth = usdt_perpetual.HTTP(
+        endpoint=TEST_BYBIT_BASE_URL,
+        api_key=TEST_BYBIT_API_KEY,
+        api_secret=TEST_BYBIT_API_SECRET
+    )
     return session_auth.get_active_order(
         order_id=order_id,
         symbol=symbol
@@ -122,19 +145,65 @@ def get_order(order_id, symbol):
 def open_bybit_order(symbol, side, take_profit, stop_loss):
     quantity = get_order_quantity(symbol)
     order_placed = place_order(symbol, side, take_profit, stop_loss, quantity)
+    '''
+    quantity = 0
+    while quantity == 0:
+        try:
+            quantity = get_order_quantity(symbol)
+            delay()
+        except:
+            pass
+
+    order_placed = None
+    while order_placed == None:
+        try:
+            order_placed = place_order(symbol, side, take_profit, stop_loss, quantity)
+            delay()
+        except:
+            pass
+    '''
     return order_placed
 
 
-def close_bybit_order(symbol, quantity):
-    return session_auth.place_active_order(
-        symbol=symbol,
-        side="Sell",
-        order_type="Market",
-        qty=quantity,
-        reduce_only=True,
-        close_on_trigger=False,
-        time_in_force="GoodTillCancel",
+def close_bybit_order(symbol, side, quantity):
+    session_auth = usdt_perpetual.HTTP(
+                endpoint=TEST_BYBIT_BASE_URL,
+                api_key=TEST_BYBIT_API_KEY,
+                api_secret=TEST_BYBIT_API_SECRET
+    )
+    return  session_auth.place_active_order(
+                symbol=symbol,
+                side=side,
+                order_type="Market",
+                qty=quantity,
+                reduce_only=True,
+                close_on_trigger=False,
+                time_in_force="GoodTillCancel",
     )['result']
+    '''
+    result = None
+    while result == None:
+        try:
+            session_auth = usdt_perpetual.HTTP(
+                endpoint=TEST_BYBIT_BASE_URL,
+                api_key=TEST_BYBIT_API_KEY,
+                api_secret=TEST_BYBIT_API_SECRET
+            )
+            result = session_auth.place_active_order(
+                symbol=symbol,
+                side=side,
+                order_type="Market",
+                qty=quantity,
+                reduce_only=True,
+                close_on_trigger=False,
+                time_in_force="GoodTillCancel",
+            )['result']
+            delay()
+        except:
+            pass
+    '''
+    return result
+
 
 
 def get_bybit_interval(interval):
@@ -184,3 +253,6 @@ def auth(url):
     full_param_str = f"{param_str}&sign={sign_real['sign']}"
     urllib3.disable_warnings()
     return f"{url}?{full_param_str}"
+
+def delay():
+    time.sleep(.2)

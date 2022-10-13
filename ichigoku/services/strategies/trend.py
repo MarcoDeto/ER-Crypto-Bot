@@ -105,9 +105,10 @@ def get_swings(data, interval):
 
     print(interval)
 
-    if len(high_swings) == 0 and len(low_swings) == 0:
-        low_swings.append({'index': low_index, 'value': low})
+    if len(high_swings) == 0:
         high_swings.append({'index': high_index, 'value': high})
+    if len(low_swings) == 0:
+        low_swings.append({'index': low_index, 'value': low})
 
     if float(low[4]) < float(low_swings[len(low_swings)-1]['value'][4]):
         if len(low_swings) > len(high_swings):
