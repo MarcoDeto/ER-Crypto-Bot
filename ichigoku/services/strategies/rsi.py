@@ -1,4 +1,4 @@
-import talib
+import talib #pip install TA-lib
 from config import ICHIMOKU_PARAMS
 from services.strategies.double import *
 from models.enums import RSIType

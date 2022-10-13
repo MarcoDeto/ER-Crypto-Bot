@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np #pip install numpy
 from config import ICHIMOKU_PARAMS
 
 from services.strategies.rsi import *
