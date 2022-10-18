@@ -10,10 +10,13 @@ from services.exchange.bybit import *
 def open_operation(telegram, ichimoku: Operation):
    link = None
    price = get_price(ichimoku.symbol)
-   tollerance = get_stop_loss_tollerance(ichimoku.time_frame)
-   stop_min = (price + (price * 0.95 / 100))
-   stop_loss = round((price - (price * tollerance / 100)), 2)
-   take_profit = round((price + (price * (tollerance * 2) / 100)), 2)
+   
+   stop_min_tollerance = get_stop_min_tollerance(ichimoku.time_frame)
+   stop_min = round((price + (price * stop_min_tollerance / 100)), 2)
+   
+   sl_tp_tollerance = get_sl_tp_tollerance(ichimoku.time_frame)
+   stop_loss = round((price - (price * sl_tp_tollerance / 100)), 2)
+   take_profit = round((price + (price * (sl_tp_tollerance * 2) / 100)), 2)
 
    if (ichimoku.cross == CrossType.LONG):
       #open_binance_order(ichimoku.symbol, 10, stop_loss)
@@ -22,8 +25,9 @@ def open_operation(telegram, ichimoku: Operation):
           ichimoku.time_frame, ichimoku.symbol, 'BINANCE')
 
    elif(ichimoku.cross == CrossType.SHORT):
-      stop_loss = round((price + (price * tollerance / 100)), 2)
-      take_profit = round((price - (price * (tollerance * 2) / 100)), 2)
+      stop_min = round((price + (price * stop_min_tollerance / 100)), 2)
+      stop_loss = round((price + (price * sl_tp_tollerance / 100)), 2)
+      take_profit = round((price - (price * (sl_tp_tollerance * 2) / 100)), 2)
       #open_bybit_order(ichimoku.symbol, 10, stop_loss)
       order_placed = open_bybit_order(ichimoku.symbol, 'Sell', take_profit, stop_loss)
       link = get_trading_view_graph(

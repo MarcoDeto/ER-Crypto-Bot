@@ -26,7 +26,37 @@ def get_open_tollerance(interval):
         case _: return 1
 
 
-def get_stop_loss_tollerance(interval):
+def get_cloud_width_tollerance(interval):
+    match (interval):
+        case '1m': return 0.02
+        case '3m': return 0.04
+        case '5m': return 0.06
+        case '15m': return 0.07
+        case '30m': return 0.09
+        case '1h': return 0.15
+        case '2h': return 0.20
+        case '4h': return 0.25
+        case '1d': return 0.35
+        case _: return 0.05
+
+
+# trading stop min tollerance
+def get_stop_min_tollerance(interval):
+    match (interval):
+        case '1m': return 0.2
+        case '3m': return 0.3
+        case '5m': return 0.4
+        case '15m': return 0.5
+        case '30m': return 0.6
+        case '1h': return 0.7
+        case '2h': return 0.8
+        case '4h': return 0.9
+        case '1d': return 1
+        case _: return 0.2
+  
+
+# stop loss and take profit tollerance
+def get_sl_tp_tollerance(interval):
     match (interval):
         case '1m': return 1.5
         case '3m': return 2
@@ -40,6 +70,7 @@ def get_stop_loss_tollerance(interval):
         case _: return 1
 
 
+# double top and double bottom tollerance
 def get_dt_db_tolerance(interval):
     match (interval):
         case '1m': return 0.05
@@ -81,7 +112,7 @@ def get_timestap(interval):
         case '1d': return 60 * 60 * 24 * 1000
         case _: return 1
 
-def get_swing_tollerange(interval):
+def get_swing_tolerance(interval):
     match (interval):
         case '1m': return 1.5
         case '3m': return 3
@@ -95,27 +126,4 @@ def get_swing_tollerange(interval):
         case '1w': return 40
         case _: return 1
 
-
-'''
-controllo le ultime 10 candele 
-cerco l'indice del massimo e del minino
-
-se min_index e max_index sono entrambi < 5
-oppure se min_index e max_index sono entrambi >= 5
-if candles[0] > candles[9]:
-    return uptrend
-else:
-    return downtrend
-
-if min_index >= 5:
-    if candles[0] > min_price:
-        return uptrend
-    else:
-        return downtrend
-elif max_index >= 5:
-    if candles[0] > max_price:
-        return uptrend
-    else:
-        return downtrend
-'''
  

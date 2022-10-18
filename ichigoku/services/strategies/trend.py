@@ -1,4 +1,3 @@
-from hashlib import new
 from services.settings import *
 from services.strategies.ichimoku import Ichimoku
 from services.strategies.double import *
@@ -169,7 +168,7 @@ def is_to_be_ignored(Xi, Xf, interval):
 
     diff = ((float(Xi) - float(Xf)) / float(Xf)) * 100
 
-    swing_tollerange = get_swing_tollerange(interval)
+    swing_tollerange = get_swing_tolerance(interval)
     # Se la differenza è maggiore o uguale al parametro, traccia una linea tra i due punti;
     # Se la differenza è minore al parametro, ignora lo swing point;
     if (diff > 0 and diff >= swing_tollerange) or (diff < 0 and diff <= -(swing_tollerange)):

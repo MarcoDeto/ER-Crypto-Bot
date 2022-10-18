@@ -12,17 +12,18 @@ def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interva
     last_price = last.close_price
     senkou_span_B = current.senkou_span_B
     close_price = current.close_price
+    senkou_span_A = current.senkou_span_A
 
     # RITEST SE SI AVVICINA A SPAN B DI UNA CERTA PERCENTUALE
-    # AGGIUNGERE CONTROLLO POSIZIONE MEDIE PRIMA DI APRIRE
-    # AGGIUNGERE AMPIEZZA ICHIMOKU
     # LAGGING SPAN CONTROLLARE PREZZO 26 PERIODI PRIMA SE è > O < A CHIUSURA 26 PERIODI Fà
     # IMPLEMENTARE 
-    
 
     #LONG
-    if (close_price > senkou_span_B and last_price < last_senkou_span_B):
-
+    if ((close_price > senkou_span_B and senkou_span_B > senkou_span_A) and last_price < last_senkou_span_B):
+             
+        is_enough = is_wide_enough(senkou_span_A, senkou_span_B, CrossType.LONG, interval)
+        if is_enough == False: return 
+        
         if larger_interval_trend == Trend.DOWNTREND:
             return
 
@@ -37,8 +38,11 @@ def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interva
                 open_long(coin, interval, telegram)
 
     #SHORT
-    if (close_price < senkou_span_B and last_price > last_senkou_span_B):
+    if ((close_price < senkou_span_B and senkou_span_B < senkou_span_A) and last_price > last_senkou_span_B):
 
+        is_enough = is_wide_enough(senkou_span_A, senkou_span_B, CrossType.SHORT, interval)
+        if is_enough == False: return 
+        
         if (larger_interval_trend == Trend.UPTREND):
             return
 
@@ -88,3 +92,9 @@ def is_just_added(coin, cross, interval):
     return False
 
 
+def is_wide_enough(senkou_span_A, senkou_span_B, cross, interval):
+    difference = get_diff_percent(senkou_span_A, senkou_span_B, cross)
+    tollerance = get_cloud_width_tollerance(interval)
+    if (difference < tollerance):
+        return False
+    return True

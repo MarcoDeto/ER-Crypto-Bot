@@ -171,39 +171,18 @@ def close_bybit_order(symbol, side, quantity):
                 api_key=TEST_BYBIT_API_KEY,
                 api_secret=TEST_BYBIT_API_SECRET
     )
-    return  session_auth.place_active_order(
-                symbol=symbol,
-                side=side,
-                order_type="Market",
-                qty=quantity,
-                reduce_only=True,
-                close_on_trigger=False,
-                time_in_force="GoodTillCancel",
-    )['result']
-    '''
-    result = None
-    while result == None:
-        try:
-            session_auth = usdt_perpetual.HTTP(
-                endpoint=TEST_BYBIT_BASE_URL,
-                api_key=TEST_BYBIT_API_KEY,
-                api_secret=TEST_BYBIT_API_SECRET
-            )
-            result = session_auth.place_active_order(
-                symbol=symbol,
-                side=side,
-                order_type="Market",
-                qty=quantity,
-                reduce_only=True,
-                close_on_trigger=False,
-                time_in_force="GoodTillCancel",
-            )['result']
-            delay()
-        except:
-            pass
-    '''
-    return result
-
+    try:
+        return  session_auth.place_active_order(
+                    symbol=symbol,
+                    side=side,
+                    order_type="Market",
+                    qty=quantity,
+                    reduce_only=True,
+                    close_on_trigger=False,
+                    time_in_force="GoodTillCancel",
+        )['result']
+    except:
+        pass   
 
 
 def get_bybit_interval(interval):
