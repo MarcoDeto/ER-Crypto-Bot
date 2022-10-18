@@ -3,6 +3,7 @@ import time
 import numpy as np
 from config import *
 from datetime import datetime
+from models.enums import CrossType
 from services.settings import *
 from services.strategies.ichimoku import *
 from services.strategies.trend import *
@@ -47,12 +48,12 @@ def distribute_data(datadict, interval):
     
 
 def get_diff_percent(Xi, Xf, cross):
-    if (cross == 'LONG'):
+    if (cross == 'LONG' or cross == CrossType.LONG):
         return ((float(Xf) - float(Xi)) / float(Xi)) * 100
-    if (cross == 'SHORT'):
+    if (cross == 'SHORT' or cross == CrossType.SHORT):
         return ((float(Xi) - float(Xf)) / float(Xf)) * 100
     else:
-        return 0
+        return None
 
 
 def get_diff_time(open, close):

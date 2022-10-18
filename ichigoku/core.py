@@ -14,48 +14,58 @@ def check_break_out(coin, interval, close_prices, ichimokus_data, larger_interva
     close_price = current.close_price
     senkou_span_A = current.senkou_span_A
 
-    # RITEST SE SI AVVICINA A SPAN B DI UNA CERTA PERCENTUALE
     # LAGGING SPAN CONTROLLARE PREZZO 26 PERIODI PRIMA SE è > O < A CHIUSURA 26 PERIODI Fà
-    # IMPLEMENTARE 
-
+    
     #LONG
-    if ((close_price > senkou_span_B and senkou_span_B > senkou_span_A) and last_price < last_senkou_span_B):
-             
-        is_enough = is_wide_enough(senkou_span_A, senkou_span_B, CrossType.LONG, interval)
-        if is_enough == False: return 
+    if larger_interval_trend == Trend.UPTREND:
+        long_is_added = is_just_added(coin, 'LONG', interval)
+        if long_is_added == True: return 
         
-        if larger_interval_trend == Trend.DOWNTREND:
-            return
+        if ((close_price > senkou_span_B and senkou_span_B > senkou_span_A) and last_price < last_senkou_span_B):
+                
+            # CHECK WIDE ICHIMOKU
+            is_enough = is_wide_enough(senkou_span_A, senkou_span_B, CrossType.LONG, interval)
+            if is_enough == False: return 
+            
+            # STANDARD OPEN
+            elif long_is_added == None:
+                if (RSI_is_alert(close_prices) == RSIType.OVERBOUGHT):
+                    open_long(coin, interval, telegram)
 
-        is_added = is_just_added(coin, 'LONG', interval)
-        if is_added == True: return 
-
-        elif is_added == False: 
-            open_long(coin, interval, telegram)
-        
-        elif is_added == None:
-            if (RSI_is_alert(close_prices) == RSIType.OVERBOUGHT):
+            # RETEST ICHIMOKU
+            elif long_is_added == False: 
                 open_long(coin, interval, telegram)
-
-    #SHORT
-    if ((close_price < senkou_span_B and senkou_span_B < senkou_span_A) and last_price > last_senkou_span_B):
-
-        is_enough = is_wide_enough(senkou_span_A, senkou_span_B, CrossType.SHORT, interval)
-        if is_enough == False: return 
         
-        if (larger_interval_trend == Trend.UPTREND):
-            return
+        # CLOSE_TO RETEST ICHIMOKU
+        if (close_price > senkou_span_B):
+            if (is_next_to_span_B(senkou_span_B, close_price, CrossType.LONG, interval)):
+                open_long(coin, interval, telegram)
+                
+    #SHORT
+    if larger_interval_trend == Trend.DOWNTREND:
+        short_is_added = is_just_added(coin, 'SHORT', interval)
+        if short_is_added == True: return 
+        
+        if ((close_price < senkou_span_B and senkou_span_B < senkou_span_A) and last_price > last_senkou_span_B):
+                
+            # CHECK WIDE ICHIMOKU
+            is_enough = is_wide_enough(senkou_span_A, senkou_span_B, CrossType.SHORT, interval)
+            if is_enough == False: return 
+            
+            # STANDARD OPEN
+            elif short_is_added == None:
+                if (RSI_is_alert(close_prices) == RSIType.OVERSOLD):
+                    open_short(coin, interval, telegram)
 
-        is_added = is_just_added(coin, 'SHORT', interval)
-        if is_added == True: return 
-
-        elif is_added == False: 
-            open_short(coin, interval, telegram)
-
-        elif is_added == None:
-            if (RSI_is_alert(close_prices) == RSIType.OVERSOLD):
+            # RETEST ICHIMOKU
+            elif short_is_added == False: 
                 open_short(coin, interval, telegram)
-
+        
+        # CLOSE_TO RETEST ICHIMOKU
+        if (close_price < senkou_span_B):
+            if (is_next_to_span_B(senkou_span_B, close_price, CrossType.SHORT, interval)):
+                open_short(coin, interval, telegram)
+                
 
 def open_long(coin, interval, telegram):
     print('LONG'+' '+interval)
@@ -98,3 +108,11 @@ def is_wide_enough(senkou_span_A, senkou_span_B, cross, interval):
     if (difference < tollerance):
         return False
     return True
+
+def is_next_to_span_B(senkou_span_B, close_price, cross, interval):
+    difference = get_diff_percent(senkou_span_B, close_price, cross)
+    max_distance = get_cloud_width_tollerance(interval)
+    if (difference < max_distance):
+        return True
+    return False
+    
