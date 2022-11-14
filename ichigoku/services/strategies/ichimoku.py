@@ -1,5 +1,6 @@
 import numpy as np #pip install numpy
 from config import ICHIMOKU_PARAMS
+from models.enums import GokuTrend
 
 from services.strategies.rsi import *
 
@@ -59,3 +60,9 @@ def get_senkou_span_B(data_array):
     long_max = data_array[:,0][start_index:end_index].max()
     lonh_min = data_array[:,1][start_index:end_index].min()
     return (long_max + lonh_min)/2
+
+def get_trend_kumo(senkou_span_A, senkou_span_B):
+    if senkou_span_A < senkou_span_B:
+        return GokuTrend.GOKUROSSO
+    elif senkou_span_A > senkou_span_B:
+        return GokuTrend.GOKUVERDE

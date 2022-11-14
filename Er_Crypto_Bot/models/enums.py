@@ -6,3 +6,4 @@ class Status(Enum):
 class CrossType(Enum):
    LONG = 1
    SHORT = 2
+   

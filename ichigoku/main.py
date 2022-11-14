@@ -46,15 +46,23 @@ def __main__():
             for symbol in SYMBOLS:
                 
                 price = get_price(symbol)
-                check_stop_losses(telegram, symbol, price)
-
+                
+                open_operartions = get_open_operations_DB(symbol)
+                
                 ichimokus_data = ichimokus[interval_i][symbol_i]
                 kijun_sen = ichimokus_data[0].kijun_sen
+                senkou_span_A = ichimokus_data[0].senkou_span_A
                 senkou_span_B = ichimokus_data[0].senkou_span_B
-                check_trailing_stops(telegram, symbol, interval, price, kijun_sen)
-
+                
                 candles_data = symbols_data[interval_i][symbol]
                 close_prices = get_close_prices(candles_data)
+                # get operazioni aperte 
+                
+                # all'inizio stop loss chiusura dopo span a
+                close_stop_losses(telegram, open_operartions, close_prices[-2], senkou_span_A, senkou_span_B)
+                
+                close_trailing_stops(telegram, open_operartions, close_prices[-2], kijun_sen)
+
                 check_take_profits(telegram, symbol, interval, price, close_prices)
                 
                 if is_resp_tolerance(interval, price, senkou_span_B) == True:

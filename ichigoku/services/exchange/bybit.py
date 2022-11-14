@@ -92,6 +92,7 @@ def get_usdt_balance():
 
 
 def get_order_quantity(symbol):
+    # TO DO aggiungere controllo su quantità minime e massime perche si blocca se non ci ssno soldi 
     usdt = get_usdt_balance()
     delay()
     usdt_quantity = (usdt * 3) / 100

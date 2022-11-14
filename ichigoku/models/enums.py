@@ -14,3 +14,7 @@ class RSIType(Enum):
 class Trend(Enum):
    UPTREND = 1
    DOWNTREND = 2
+   
+class GokuTrend(Enum):
+   GOKUVERDE = 0
+   GOKUROSSO = 1

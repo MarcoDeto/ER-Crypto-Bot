@@ -20,8 +20,37 @@ class Operation:
       self.time_frame = time_frame
 
 
-def get_insert_ichimoku(operation: Operation, open_price, stop_min, order_placed):
-   return {
+def get_insert_ichimoku(operation: Operation, open_price, side, stop_min, take_profit, stop_loss, order_placed):
+   if order_placed ==  None:
+      return {
+       '_id': ObjectId(),
+       'order_id': '',
+       'symbol': operation.symbol,
+       'base': operation.base,
+       'quote': operation.quote,
+       'isMarginTrade': operation.isMarginTrade,
+       'isBuyAllowed': operation.isBuyAllowed,
+       'isSellAllowed': operation.isSellAllowed,
+       'open_price': open_price,
+       'qty': '',
+       'order_status': '',
+       'cum_exec_fee': '',
+       'close_price': None,
+       'open_date': datetime.now(),
+       'close_date': None,
+       'operation_number': operation.operation_number,
+       'cross': operation.cross.name,
+       'side': '',
+       'time_frame': operation.time_frame,
+       'percent': 0,
+       'seconds': 0,
+       'status': 'OPEN',
+       'stop_min': round(stop_min, 2),
+       'stop_loss': round(stop_loss, 2),
+       'take_profit': round(take_profit, 2)
+      }
+   else :
+      return {
        '_id': ObjectId(),
        'order_id': order_placed['order_id'],
        'symbol': operation.symbol,
@@ -47,7 +76,7 @@ def get_insert_ichimoku(operation: Operation, open_price, stop_min, order_placed
        'stop_min': round(stop_min, 2),
        'stop_loss': round(order_placed['stop_loss'], 2),
        'take_profit': round(order_placed['take_profit'], 2)
-   }
+      }
 
 
 def get_update_ichimoku(operation, price, status):

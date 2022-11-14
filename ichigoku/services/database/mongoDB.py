@@ -44,6 +44,21 @@ def getIchimokuDB(coin, cross, interval):
    return coin
 
 
+def get_open_operations_DB(coin):
+   
+   query = get_open_operations(coin)
+
+   item_details = collection.find(query).sort('open_date', pymongo.DESCENDING)
+   result = {}
+   i = 0
+   for item in item_details:
+      result[i] = item
+      i = i+1
+   if (len(result) > 0):
+      return result
+   return None
+
+
 def get_operation_DB(coin, cross, interval):
    operationDB = getIchimokuDB(coin, cross, interval)
    if (operationDB):
@@ -74,50 +89,82 @@ def insert_ichiGoku(ichimoku):
    collection.insert_one(ichimoku)
 
 
-def get_trailing_stops(symbol, interval, price, kijun_sen):
-   item_details = None
+def get_trailing_stops(open_operations, price, senkou_span_A, senkou_span_B):
    result = []
-   if (price < kijun_sen):
-      query = get_long_trailing_stop(symbol, interval, price)
-      item_details = collection.find(query)
+   # if (price < kijun_sen):
+   #    query = get_long_trailing_stop(symbol, interval, price)
+   #    item_details = collection.find(query)
 
-   elif (price > kijun_sen):
-      query = get_short_trailing_stop(symbol, interval, price)
-      item_details = collection.find(query)
+   # elif (price > kijun_sen):
+   #    query = get_short_trailing_stop(symbol, interval, price)
+   #    item_details = collection.find(query)
 
-   if item_details != None:
-      for item in item_details:
-         result.append(item)
+   # if item_details != None:
+   #    for item in item_details:
+   #       result.append(item)
+         
+   if open_operations == None or len(open_operations) == 0:
+      return None
+   i = 0
+   #50% con kingunsen e 50% con senkou_span_B
+   for operation in open_operations:
+
+      if open_operations[i]['cross'] == 'SHORT' and price > senkou_span_B and senkou_span_B > senkou_span_A:
+         result.append(open_operations[i])
+      if open_operations[i]['cross'] == 'LONG' and price < senkou_span_B and senkou_span_A < senkou_span_B:
+         result.append(open_operations[i])
+      i = i + 1
+
    return result
 
 
-def get_stop_losses(symbol, price):
+def get_stop_losses(open_operations, price, senkou_span_A, senkou_span_B):
    result = []
-   query = get_long_stop_loss(symbol, price)
-   item_details = collection.find(query)
-   for item in item_details:
-      result.append(item)
+   # query = get_long_stop_loss(symbol, price)
+   # item_details = collection.find(query)
+   # for item in item_details:
+   #    result.append(item)
 
-   query = get_short_stop_loss(symbol, price)
-   item_details = collection.find(query)
-   for item in item_details:
-      result.append(item)
+   # query = get_short_stop_loss(symbol, price)
+   # item_details = collection.find(query)
+   # for item in item_details:
+   #    result.append(item)
+   if open_operations == None or len(open_operations) == 0:
+      return None
+   i = 0
+   for operation in open_operations:
+      
+      if open_operations[i]['cross'] == 'SHORT' and price > senkou_span_A and senkou_span_A > senkou_span_B:
+         result.append(open_operations[i])
+      if open_operations[i]['cross'] == 'LONG' and price < senkou_span_A and senkou_span_A < senkou_span_B:
+         result.append(open_operations[i])
+      i = i + 1
 
    return result
 
 
-def get_take_profits(symbol, price):
+def get_take_profits(open_operations, price, kijun_sen, senkou_span_A, senkou_span_B):
+   
    result = []
-   query = get_long_take_profits(symbol, price)
-   item_details = collection.find(query)
-   for item in item_details:
-      result.append(item)
+   # query = get_long_take_profits(symbol, price)
+   # item_details = collection.find(query)
+   # for item in item_details:
+   #    result.append(item)
 
-   query = get_short_take_profits(symbol, price)
-   item_details = collection.find(query)
-   for item in item_details:
-      result.append(item)
+   # query = get_short_take_profits(symbol, price)
+   # item_details = collection.find(query)
+   # for item in item_details:
+   #    result.append(item)
 
+   i = 0
+   for operation in open_operations:
+      if open_operations[i]['cross'] == 'SHORT' and price > kijun_sen and senkou_span_B > senkou_span_A:
+         result.append(open_operations[i])
+      if open_operations[i]['cross'] == 'LONG' and price < kijun_sen and senkou_span_A < senkou_span_B:
+         result.append(open_operations[i])
+      i = i + 1
+
+         
    return result
 
 

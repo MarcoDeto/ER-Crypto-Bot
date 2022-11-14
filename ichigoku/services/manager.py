@@ -17,10 +17,12 @@ def open_operation(telegram, ichimoku: Operation):
    sl_tp_tollerance = get_sl_tp_tollerance(ichimoku.time_frame)
    stop_loss = round((price - (price * sl_tp_tollerance / 100)), 2)
    take_profit = round((price + (price * (sl_tp_tollerance * 2) / 100)), 2)
+   side = 'Buy'
 
    if (ichimoku.cross == CrossType.LONG):
       #open_binance_order(ichimoku.symbol, 10, stop_loss)
-      order_placed = open_bybit_order(ichimoku.symbol, 'Buy', take_profit, stop_loss)
+      #order_placed = open_bybit_order(ichimoku.symbol, side, take_profit, stop_loss)
+      order_placed = None
       link = get_trading_view_graph(
           ichimoku.time_frame, ichimoku.symbol, 'BINANCE')
 
@@ -28,12 +30,14 @@ def open_operation(telegram, ichimoku: Operation):
       stop_min = round((price + (price * stop_min_tollerance / 100)), 2)
       stop_loss = round((price + (price * sl_tp_tollerance / 100)), 2)
       take_profit = round((price - (price * (sl_tp_tollerance * 2) / 100)), 2)
+      side = 'Sell'
       #open_bybit_order(ichimoku.symbol, 10, stop_loss)
-      order_placed = open_bybit_order(ichimoku.symbol, 'Sell', take_profit, stop_loss)
+      #order_placed = open_bybit_order(ichimoku.symbol, side, take_profit, stop_loss)
+      order_placed = None
       link = get_trading_view_graph(
           ichimoku.time_frame, ichimoku.symbol, 'BYBIT')
 
-   operation = get_insert_ichimoku(ichimoku, price, stop_min, order_placed)
+   operation = get_insert_ichimoku(ichimoku, price, side, stop_min, take_profit, stop_loss, order_placed)
 
    insert_ichiGoku(operation)
    send_open_messages(telegram, link, operation)
@@ -60,20 +64,24 @@ def close_operation(telegram, ichimoku, price, status):
    send_close_messages(telegram, link, operation, status)
 
 
-def check_stop_losses(telegram, symbol, price):
-
-   stop_losses = get_stop_losses(symbol, price)
+def close_stop_losses(telegram, open_operations, price, senkou_span_A, senkou_span_B):
+   
+   stop_losses = get_stop_losses(open_operations, price, senkou_span_A, senkou_span_B)
    for operation in stop_losses:
       print('STOP LOSS')
       close_operation(telegram, operation, price, status='STOP LOSS')
 
 
-def check_trailing_stops(telegram, symbol, interval, price, kijun_sen):
+def close_trailing_stops(telegram, open_operartions, price, kijun_sen):
 
-   trailing_stops = get_trailing_stops(symbol, interval, price, kijun_sen)
-   for operation in trailing_stops:
-      print('TRAILING STOP')
-      close_operation(telegram, operation, price, status='TRAILING STOP')
+   #trailing_stops = get_trailing_stops(symbol, interval, price, kijun_sen)
+   for operation in open_operartions:
+      if price > operation['stop_min'] and operation['cross'] == 'LONG' and price < kijun_sen:
+         print('TRAILING STOP')
+         close_operation(telegram, operation, price, status='TRAILING STOP')
+      if price < operation['stop_min'] and operation['cross'] == 'SHORT' and price > kijun_sen:
+         print('TRAILING STOP')
+         close_operation(telegram, operation, price, status='TRAILING STOP')
 
 
 def check_take_profits(telegram, symbol, interval, price, close_prices):

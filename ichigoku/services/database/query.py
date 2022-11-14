@@ -13,7 +13,15 @@ def get_operation_number(coin, interval):
        'time_frame': interval,
        'close_price': {'$ne': None}
    }
-
+   
+   
+def get_open_operations(symbol):
+   return {
+       'symbol': symbol,
+       'status': 'OPEN',
+       'close_price': {'$eq': None}
+   }
+   
 
 def get_open_ichimoku(coin, cross, interval):
    return {
@@ -32,7 +40,7 @@ def get_long_trailing_stop(symbol, interval, price):
        'cross': 'LONG',
        'time_frame': interval,
        'stop_min': {'$lt': price},
-       'open_price': {'$lt': price},
+       #'open_price': {'$lt': price},
        'close_price': {'$eq': None}
    }
 
@@ -44,7 +52,7 @@ def get_short_trailing_stop(symbol, interval, price):
        'cross': 'SHORT',
        'time_frame': interval,
        'stop_min': {'$gt': price},
-       'open_price': {'$gt': price},
+       #'open_price': {'$gt': price},
        'close_price': {'$eq': None}
    }
 
